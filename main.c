@@ -3,12 +3,6 @@
     Compilar este archivo con el siguiente comando: 
     gcc -o Proyecto main.c --> Esto para tener un orden al momento de crear los ejecutables
     ./Proyecto             --> Comando para ejecutar el programa
-
-    Para hacer los cambios en Github, den click en la extensión y donde dice 'Confirmación',
-    luego usen el siguiente comando en la terminal:
-    git push -uf origin main
-
-    Si no lo hacen así la extensión en Visual se va a quedar pegada
 */
 
 #include <stdio.h>        /* Entrada y Salida Estándar */
