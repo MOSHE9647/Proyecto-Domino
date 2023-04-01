@@ -39,6 +39,8 @@ _Estas instrucciones te permitirán obtener un entorno de desarrollo Ubuntu comp
 
 Y listo, ya con esto tendríamos nuestro entorno de desarrollo listo para trabajar. Podemos presionar las teclas ```Win + Ñ``` para abrir una ventana del terminal dentro de Visual, o directamente ir a ```Terminal >> Nuevo Terminal``` opción que aparece en la barra de herramientas de arriba.
 
+* **PD:** _Para dejar de usar Visual Studio Code en Ubuntu y pasar a usarlo con Windows, solamente debemos dar Click en el botón que aparece en la esquina inferior izquierda del Visual (que dice ```WSL: Ubuntu```) y seleccionar la opción que dice ```Cerrar conexión remota```. De igual forma, para volver entrar podemos darle al mismo botón y dar click donde dice ```Conectar a WSL```, o en Ubuntu abrir la carpeta en la que queramos trabajar (con ```cd```) y escribimos de nuevo el comando ```code .```_
+
 ---
 
 ## Ejecutando las pruebas ⚙️
@@ -61,7 +63,6 @@ _Debería aparecer un mensaje como el siguiente:_
 2. **Probar que se compile correctamente:** _Para empezar pueden crear un archivo ```main.c```, que contenga el siguiente código de prueba:_
 
 ```
-// Archivo 'main.c'
 #include <stdio.h>
 
 int main () {
@@ -83,14 +84,14 @@ _El archivo debería compilar y mostrarles el mensaje ```Hello, world!!``` en la
 
 ## Construido con 🛠️
 
-_Menciona las herramientas que utilizaste para crear tu proyecto_
+_Herramientas que se utilizaron para crear el juego:_
 
 * [Visual Studio Code](https://code.visualstudio.com/) - El Editor Utilizado
 * [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) - Para la Ejecución del Código
 
 ## Autores ✒️
 
-_Los integrantes que conforman el grupo son los siguientes:_
+_Los integrantes que conformamos el grupo somos los siguientes:_
 
 * **Isaac Herrera**  - *[Moshe9647](https://github.com/MOSHE9647)*
 * **Melanie Oviedo** - *[Melanie_OM](#fulanito-de-tal)*
