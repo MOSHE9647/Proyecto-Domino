@@ -3,6 +3,9 @@
     Compilar este archivo con el siguiente comando: 
     gcc -o Proyecto main.c --> Esto para tener un orden al momento de crear los ejecutables
     ./Proyecto             --> Comando para ejecutar el programa
+
+    Para hacer los cambios en Github, usar el siguiente comando:
+
 */
 
 #include <stdio.h>        /* Entrada y Salida Estándar */
@@ -12,6 +15,7 @@
 #include <unistd.h>
 #include <time.h>         /* Para números aleatorios   */
 
+#define ARCHIVO_TXT "./log.txt"
 #define CHAR_LIMIT 1024   /* Límite de Carácteres para los Nombres y Lectura de Archivos */
 #define MAX_PLAYERS 7     /* Cantidad Maxima de Jugadores que admite el Juego            */
 #define DOMINO 28         /* Cantidad máxima de fichas que posee el juego                */
@@ -174,7 +178,7 @@ void escribir (Jugador *j) {
 	char Edad[CHAR_LIMIT];  /* Variable para almacenar la edad en formato string   */
 	char ID[CHAR_LIMIT];    /* Variable para almacenar la ID en formato string     */
 
-	archivo = fopen("log.txt", "a"); /* Abrimos el archivo en modo escritura sin sobreescribir */
+	archivo = fopen(ARCHIVO_TXT, "a"); /* Abrimos el archivo en modo escritura sin sobreescribir */
 
     // Verificamos que se haya leído el archivo:
 	if (archivo == NULL) {
@@ -196,7 +200,7 @@ void escribir (Jugador *j) {
 /* No sé si esta función sea necesaria */
 void leer () {
 	FILE *archivo;                   /* Variable que apunta al Archivo que vamos a utilizar */
-	archivo = fopen("log.txt", "r"); /* Abrimos el archivo en Modo Lectura */
+	archivo = fopen(ARCHIVO_TXT, "r"); /* Abrimos el archivo en Modo Lectura */
 	
     char nombre[CHAR_LIMIT];         /* Variable que almacena el nombre en formato string */
 	int edad;
