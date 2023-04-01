@@ -2,10 +2,11 @@
 
 _Este proyecto se basa en la creación de un juego de Domino para el curso de Sistemas Operativos de la carrera de Ingeniería en Sistemas (3 Nivel). El juego utiliza un sistema de hilos para cada jugador, haciendo que el juego sea automático_
 
+---
+
 ## Comenzando 🚀
 
 _Estas instrucciones te permitirán obtener un entorno de desarrollo Ubuntu completo en tu sistema Windows sin tener que hacer una instalación del mismo._
-
 
 ### Pre-requisitos 📋
 
@@ -38,6 +39,8 @@ _Estas instrucciones te permitirán obtener un entorno de desarrollo Ubuntu comp
 
 Y listo, ya con esto tendríamos nuestro entorno de desarrollo listo para trabajar. Podemos presionar las teclas ```Win + Ñ``` para abrir una ventana del terminal dentro de Visual, o directamente ir a ```Terminal >> Nuevo Terminal``` opción que aparece en la barra de herramientas de arriba.
 
+---
+
 ## Ejecutando las pruebas ⚙️
 
 _Para probar que todo haya quedado correctamente instalado, podemos realizar las siguientes pruebas:_
@@ -48,7 +51,7 @@ _Para probar que todo haya quedado correctamente instalado, podemos realizar las
 gcc --version
 ```
 
-_Debería aparecer lo siguiente:_
+_Debería aparecer un mensaje como el siguiente:_
 
     gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0
     Copyright (C) 2021 Free Software Foundation, Inc.
@@ -75,6 +78,8 @@ gcc -o main main.c
 ```
 
 _El archivo debería compilar y mostrarles el mensaje ```Hello, world!!``` en la terminal_
+
+---
 
 ## Construido con 🛠️
 
