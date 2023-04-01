@@ -18,21 +18,21 @@ _Estas instrucciones te permitirán obtener un entorno de desarrollo Ubuntu comp
 
 1. Abre el menú de incio, busca ```cmd```, y ejecútalo como Administrador (Click Derecho >> Ejecutar como Administrador)
 
-2. Una vez abierta la ventana asegúrate de que diga:
+2. Una vez abierta la ventana asegúrate de que esta diga: ```C:\Windows\System32>```
 
-```
-C:\Windows\System32>
-```
+3. Ahora instalamos WSL. Instalaremos de forma predeterminada la distro Ubuntu. Escribimos: ```wsl --install```. _Esperamos a que finalice la instalación. Una vez finalizada nos solicitará un usuario y contraseña, los cuales debemos recordar para más adelante._
 
-3. Ahora instalamos WSL. Este comando utiliza de forma predeterminada la distro Ubuntu. Escribimos:
+4. Una vez instalado (y ejecutándose) Ubuntu, escribimos ```sudo su``` y escribimos nuestra contraseña. Una vez hecho esto escribimos los comandos ```apt-get update``` y ```apt-get upgrade```, para buscar e instalar actualizaciones respectivamente.
 
-```
-wsl --install
-```
+5. Por último, debemos escribir el comando _```sudo chown -R nombre_de_usuario /home/nombre_de_usuario/```_, cambiando _```nombre_de_usuario```_ por el nombre que hayan escogido al iniciar por primera vez. Con esto ya tendríamos Ubuntu actualizado y listo para trabajar.
 
-    _Esperamos a que finalice la instalación. Una vez finalizada nos solicitara una usuario y contraseña, la cual debemos recordar para más adelante._
+**Compilador:** _Para instalar el compilador de C (GCC), sencillamente debemos de introducir el comando ```sudo apt install gcc```, y ya con esto estaría instalado._
 
-4. 
+**Visual Studio Code:**
+
+1. Lo primero que debemos hacer es instalar el programa, para eso nos dirigimos a **_[su página](https://code.visualstudio.com/)_** y descargamos el programa y lo instalamos siguiendo sus indicaciones.
+
+2. Una vez instalado, debemos dirigirnos al apartado de extensiones y buscar la extensión WSL, o puedes instalarla directamente desde **_[este enlace](vscode:extension/ms-vscode-remote.remote-wsl)_**
 
 ## Ejecutando las pruebas ⚙️
 
