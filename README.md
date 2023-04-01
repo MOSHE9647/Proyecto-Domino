@@ -30,17 +30,51 @@ _Estas instrucciones te permitirán obtener un entorno de desarrollo Ubuntu comp
 
 **Visual Studio Code:**
 
-1. Lo primero que debemos hacer es instalar el programa, para eso nos dirigimos a **_[su página](https://code.visualstudio.com/)_** y descargamos el programa y lo instalamos siguiendo sus indicaciones.
+1. Lo primero que debemos hacer es instalar el programa en Windows, para esto nos dirigimos a **_[su página](https://code.visualstudio.com/)_** y descargamos el programa y lo instalamos siguiendo sus indicaciones. (_Cuando se le solicite Seleccionar tareas adicionales durante la instalación, asegúrese de marcar la opción **Add to Path** para que pueda abrir fácilmente una carpeta en WSL._)
 
 2. Una vez instalado, debemos dirigirnos al apartado de extensiones y buscar la extensión WSL, o puedes instalarla directamente desde **_[este enlace](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl)_**.
 
 3. Ya instalada la extensión, cerramos Visual Studio Code y abrimos Ubuntu (_aparece en el menú de Windows como una aplicación más_). Dentro de Ubuntu escribimos el comando _```code .```_ (_incluyendo el punto al final_) y esperamos a que descargue el servidor y arranque de nuevo Visual Studio Code.
 
-Y listo, ya con esto tendríamos nuestro entorno desarrollo listo para trabajar.
+Y listo, ya con esto tendríamos nuestro entorno de desarrollo listo para trabajar. Podemos presionar las teclas ```Win + Ñ``` para abrir una ventana del terminal dentro de Visual, o directamente ir a ```Terminal >> Nuevo Terminal``` opción que aparece en la barra de herramientas de arriba.
 
 ## Ejecutando las pruebas ⚙️
 
-_Explica como ejecutar las pruebas automatizadas para este sistema_
+_Para probar que todo haya quedado correctamente instalado, podemos realizar las siguientes pruebas:_
+
+1. **Revisar que el Compilador (GCC) se haya instalado correctamente:** _En Ubuntu, escribir:_
+
+```
+gcc --version
+```
+
+_Debería aparecer lo siguiente:_
+
+    gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0
+    Copyright (C) 2021 Free Software Foundation, Inc.
+    This is free software; see the source for copying conditions.  There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+2. **Probar que se compile correctamente:** _Para empezar pueden crear un archivo ```main.c```, que contenga el siguiente código de prueba:_
+
+```
+// Archivo 'main.c'
+#include <stdio.h>
+
+int main () {
+    printf("Hello, world!!\n");
+    return 0;
+}
+```
+
+_Una vez creado el archivo, abrimos la terminal de Visual Studio (```Win + Ñ```) y escribimos lo siguiente en orden (uno por uno):_
+
+```
+gcc -o main main.c
+./main
+```
+
+_El archivo debería compilar y mostrarles el mensaje ```Hello, world!!``` en la terminal_
 
 ## Construido con 🛠️
 
