@@ -1,8 +1,8 @@
 /*
     Archivo de Trabajo del Proyecto. Aquí vamos a unir todo lo que hayamos hecho del proyecto
     Compilar este archivo con el siguiente comando: 
-    gcc -o Proyecto main.c --> Esto para tener un orden al momento de crear los ejecutables
-    ./Proyecto             --> Comando para ejecutar el programa
+    gcc main.c --> Esto para tener un orden al momento de crear los ejecutables
+    ./main     --> Comando para ejecutar el programa
 */
 
 #include <stdio.h>        /* Entrada y Salida Estándar */
@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <time.h>         /* Para números aleatorios   */
 
-#define ARCHIVO_TXT "./log.txt"
+#define ARCHIVO_TXT "../log.txt"
 #define CHAR_LIMIT 1024   /* Límite de Carácteres para los Nombres y Lectura de Archivos */
 #define MAX_PLAYERS 7     /* Cantidad Maxima de Jugadores que admite el Juego            */
 #define DOMINO 28         /* Cantidad máxima de fichas que posee el juego                */
@@ -62,8 +62,9 @@ void systemPause();                         /* Funcion para pausar la pantalla  
 
 /* Inico: Funcion Principal del Programa */
 int main () {
-    int opc = 0;
+    int opc;
 	do {
+        opc = 0;
 		printf ("\n\t╔════════╣ JUEGO DOMINO ╠════════╗\n");
 		printf ("\t║                                ║\n");
 		printf ("\t║         1. Juego Nuevo         ║\n");
