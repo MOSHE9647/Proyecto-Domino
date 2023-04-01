@@ -32,7 +32,7 @@ _Estas instrucciones te permitirán obtener un entorno de desarrollo Ubuntu comp
 
 1. Lo primero que debemos hacer es instalar el programa, para eso nos dirigimos a **_[su página](https://code.visualstudio.com/)_** y descargamos el programa y lo instalamos siguiendo sus indicaciones.
 
-2. Una vez instalado, debemos dirigirnos al apartado de extensiones y buscar la extensión WSL, o puedes instalarla directamente desde **_[este enlace](vscode:extension/ms-vscode-remote.remote-wsl)_**
+2. Una vez instalado, debemos dirigirnos al apartado de extensiones y buscar la extensión WSL, o puedes instalarla directamente desde **_[este enlace](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl)_**
 
 ## Ejecutando las pruebas ⚙️
 
