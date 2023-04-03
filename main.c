@@ -12,10 +12,10 @@
 #include <unistd.h>
 #include <time.h>         /* Para números aleatorios   */
 
-#define ARCHIVO_TXT "../log.txt"
-#define CHAR_LIMIT 1024   /* Límite de Carácteres para los Nombres y Lectura de Archivos */
-#define MAX_PLAYERS 7     /* Cantidad Maxima de Jugadores que admite el Juego            */
-#define DOMINO 28         /* Cantidad máxima de fichas que posee el juego                */
+#define ARCHIVO_TXT "log.txt"    /* Definición de la ruta de acceso al archivo 'log.txt'        */
+#define CHAR_LIMIT 1024          /* Límite de Carácteres para los Nombres y Lectura de Archivos */
+#define MAX_PLAYERS 7            /* Cantidad Maxima de Jugadores que admite el Juego            */
+#define DOMINO 28                /* Cantidad máxima de fichas que posee el juego                */
 
 /* 
     Si les marca error con las variables o funciones de tipo 'bool',
