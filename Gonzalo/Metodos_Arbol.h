@@ -160,6 +160,7 @@ Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
 }
 /**
  * Aquie en  adelante van los metodos de mostreo
+ * adasd
  **/
 void muestra_Recursivo(Nodo *actual){
    if(actual != NULL){
