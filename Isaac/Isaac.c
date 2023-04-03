@@ -47,6 +47,9 @@ int main () {
     if (crearFichas()) { printf ("Se crearon las Fichas.\n"); }
     else { printf ("No se pudieron crear las Fichas.\n"); }
 
+
+    // Comentario de Prueba
+
     repartirFichas();
 
     return 0;
