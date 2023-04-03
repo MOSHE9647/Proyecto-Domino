@@ -30,7 +30,7 @@ void Guardando_Nodo(Nodo *actual, Nodo* nuevo, int direccion){
 				nuevo->anterior = actual;
 				actual->siguiente = nuevo;
 			}
-		}else if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 1){
+		}else if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 0){
 			if(actual->arriba == NULL && direccion == 1){
 				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
@@ -53,6 +53,7 @@ void Guardando_Nodo(Nodo *actual, Nodo* nuevo, int direccion){
 
 			}
 		}else{
+			determinando_salida(actual, nuevo);
 			nuevo->anterior = actual;
 			actual->siguiente = nuevo;
 		}
@@ -61,9 +62,8 @@ void Guardando_Nodo(Nodo *actual, Nodo* nuevo, int direccion){
 
 void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccion){
 	if(actual != NULL){
-		if(actual == destino){
+		if(actual == destino)
 			Guardando_Nodo(actual, nuevo, direccion);
-		}
 	}else{
 		if(actual->dato->ficha[0] == actual->dato->ficha[1]){
 			asignacion_recursivo(actual->arriba, nuevo, destino, direccion);
@@ -80,9 +80,10 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
 	Nodo *nuevo = CreandoNodo(domino);// crea el nodo apartir del la ficha recibida
  	if(mesa->raiz == NULL){
 		mesa->raiz = nuevo;
-	}else if(mesa->raiz == destino){
+		mesa->raiz->dato->salida = 0;
+	}else if(mesa->raiz == destino)
 		Guardando_Nodo(mesa->raiz, nuevo, direccion);
-	}else{
+	else{
       	asignacion_recursivo(mesa->raiz->anterior, nuevo, destino, direccion);
 		asignacion_recursivo(mesa->raiz, nuevo, destino, direccion);
 	}
@@ -101,13 +102,16 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 }
 void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo**/
     if(actual != NULL){/** esta condicion evita la recursividad "infinita" **/
-		if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 1){
-			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL){
+		/**si la ficha es libre y no este cruzada y no este cruzada osea es 0 entoces revisa todos
+		 * sus lados en busca de una salida libre para tomarlo como siguiente ficha disponible
+		 * de lo contrario sera tomada como ficha ordinaria
+		 * **/
+		if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 0)
+			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL)
 				ingresar_Lista(lista, actual);
-			} 
-		}else if(actual->siguiente == NULL){
+		else if(actual->siguiente == NULL)
 				ingresar_Lista(lista, actual);
-		}	
+
 		Buscando_fichas_disponibles(lista, actual->siguiente);
 		Buscando_fichas_disponibles(lista, actual->arriba);
 		Buscando_fichas_disponibles(lista, actual->abajo);
@@ -117,7 +121,8 @@ void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo*
 Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
 	Lista* lista = NULL;
 	  if(mesa->raiz != NULL){
-      	Lista* lista = (Lista*)calloc(sizeof(Lista),1);
+      	lista = (Lista*)calloc(sizeof(Lista),1);
+		/**---REVISA QUE LA PRIMERA FICHA ESTE LIBRE-----**/
 		if(mesa->raiz->siguiente == NULL || mesa->raiz->anterior == NULL || mesa->raiz->arriba == NULL || mesa->raiz->abajo == NULL){
 			ingresar_Lista(lista,mesa->raiz);
 		}
