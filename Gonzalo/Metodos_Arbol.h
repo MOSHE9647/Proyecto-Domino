@@ -122,7 +122,7 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 
 void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo**/
     if(actual != NULL){/** esta condicion evita la recursividad "infinita" **/
-		/**si la ficha es libre y no este cruzada y no este cruzada osea es 0 entoces revisa todos
+		/**si la ficha es libre y no este cruzada osea es 0 entoces revisa todos
 		 * sus lados en busca de una salida libre para tomarlo como siguiente ficha disponible
 		 * de lo contrario sera tomada como ficha ordinaria
 		 * **/
