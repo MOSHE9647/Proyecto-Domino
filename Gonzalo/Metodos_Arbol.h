@@ -12,33 +12,47 @@ Nodo* CreandoNodo(Ficha *domino){
 	nuevo->dato = domino;
 	return nuevo;
 }
+/**guarda cual es el lado de la ficha que esta disponible para la siguiente ronda**/
+void determinando_salida(Nodo *actual, Nodo *nuevo){
+	int salida = actual->dato->salida;
+	if(actual->dato->ficha[salida] == nuevo->dato->ficha[0]){
+        nuevo->dato->salida = 1;
+	}else if(actual->dato->ficha[salida] == nuevo->dato->ficha[1]){
+		nuevo->dato->salida = 0;
+	}
+}
 
 void Guardando_Nodo(Nodo *actual, Nodo* nuevo, int direccion){
 	if(actual != NULL){
 		if(actual->dato->ficha[0] != actual->dato->ficha[1]){
 			if(actual->siguiente == NULL){
+				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
 				actual->siguiente = nuevo;
 			}
 		}else if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 1){
 			if(actual->arriba == NULL && direccion == 1){
+				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
 				actual->arriba = nuevo;
 			
 			}else if(actual->siguiente == NULL && direccion == 2){
+				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
 				actual->siguiente = nuevo;
 
-			}else if(actual->abajo == NULL direccion == 3){
+			}else if(actual->abajo == NULL && direccion == 3){
+				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
 				actual->abajo = nuevo;
 
 			}else if(actual->anterior == NULL && direccion == 0){
+				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
 				actual->anterior = nuevo;
 
 			}
-		}else{	
+		}else{
 			nuevo->anterior = actual;
 			actual->siguiente = nuevo;
 		}
@@ -52,10 +66,10 @@ void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccio
 		}
 	}else{
 		if(actual->dato->ficha[0] == actual->dato->ficha[1]){
-			asignacion_recursivo(actual->arriba, nuevo, destino);
-			asignacion_recursivo(actual->abajo, nuevo, destino);
+			asignacion_recursivo(actual->arriba, nuevo, destino, direccion);
+			asignacion_recursivo(actual->abajo, nuevo, destino, direccion);
 		}
-		asignacion_recursivo(actual->siguiente, nuevo, destino);
+		asignacion_recursivo(actual->siguiente, nuevo, destino, direccion);
 	}
 }
 /**
@@ -67,7 +81,7 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
  	if(mesa->raiz == NULL){
 		mesa->raiz = nuevo;
 	}else if(mesa->raiz == destino){
-		Guardando_Nodo(mesa->raiz, nuevo,int direccion);
+		Guardando_Nodo(mesa->raiz, nuevo, direccion);
 	}else{
       	asignacion_recursivo(mesa->raiz->anterior, nuevo, destino, direccion);
 		asignacion_recursivo(mesa->raiz, nuevo, destino, direccion);
@@ -76,15 +90,48 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
 /**
  * aqui creo la lista con los nodos libres
  **/
-void ingresar_Lista(Lista *lista, Nodo* Nodo){
-
+void ingresar_Lista(Lista *lista, Nodo* nodo){
+	if(lista->primero == NULL){
+		lista->primero = nodo;
+		lista->ultimo = nodo;
+	}else{
+		lista->ultimo->sig_auxiliar = nodo;
+		lista->ultimo = nodo;
+	}
 }
-void Buscando_fichas_disponibles(){
-
+void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo**/
+    if(actual != NULL){/** esta condicion evita la recursividad "infinita" **/
+		if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 1){
+			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL){
+				ingresar_Lista(lista, actual);
+			} 
+		}else if(actual->siguiente == NULL){
+				ingresar_Lista(lista, actual);
+		}	
+		Buscando_fichas_disponibles(lista, actual->siguiente);
+		Buscando_fichas_disponibles(lista, actual->arriba);
+		Buscando_fichas_disponibles(lista, actual->abajo);
+	}
 }
 
 Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
-
+	Lista* lista = NULL;
+	  if(mesa->raiz != NULL){
+      	Lista* lista = (Lista*)calloc(sizeof(Lista),1);
+		if(mesa->raiz->siguiente == NULL || mesa->raiz->anterior == NULL || mesa->raiz->arriba == NULL || mesa->raiz->abajo == NULL){
+			ingresar_Lista(lista,mesa->raiz);
+		}
+		/** si el nodo raiz es uno de los que tiene libre entoces
+		 * entoces lo guardara en en la condicion if linea 108 y 109
+		 * por lo que no hace falta pasarlo al buscando_fichas disponible()
+		 * y en el tal caso de que no cumpla no afectara ya que no cumplira con los requisitos
+		 * **/
+		Buscando_fichas_disponibles(lista, mesa->raiz->arriba);
+		Buscando_fichas_disponibles(lista, mesa->raiz->abajo);
+		Buscando_fichas_disponibles(lista, mesa->raiz->siguiente);
+		Buscando_fichas_disponibles(lista, mesa->raiz->anterior);
+	  }
+	  return lista; // si retorna NULL es por que no hay nada en la mesa
 }
 /**
  * Aquie en  adelante van los metodos de mostreo

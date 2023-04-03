@@ -12,7 +12,7 @@ struct Ficha{
 
 struct Nodo{
 	Ficha* dato;
-	Nodo* anterior, *arriba, *abajo, *siguiente;	
+	Nodo* anterior, *arriba, *abajo, *siguiente, *sig_auxiliar;// el sig_auxiliar es para las listas temporales	
 	int cruzado;/**nos dice esta colocada vertical o no**/	
 };
 
