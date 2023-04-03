@@ -89,17 +89,37 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
 	}
 }	
 /**
- * aqui creo la lista con los nodos libres
+ * aqui creo la lista con los nodos libres de la mesa
+ * de una manera ordenada jejej
  **/
 void ingresar_Lista(Lista *lista, Nodo* nodo){
 	if(lista->primero == NULL){
 		lista->primero = nodo;
-		lista->ultimo = nodo;
+		lista->ultimo = nodo; 
 	}else{
+		if(lista->primero->dato->ficha[lista->primero->dato->salida] >= nodo->dato->ficha[nodo->dato->salida]){
+			nodo->sig_auxiliar = lista->primero;
+			lista->primero = nodo;
+		}else if(lista->ultimo->dato->ficha[lista->primero->dato->salida] <= nodo->dato->ficha[nodo->dato->salida]){
+			lista->ultimo->sig_auxiliar = nodo;
+			lista->ultimo = nodo;
+		}else{
+
+			Nodo *actual = lista->primero;
+			while (actual->sig_auxiliar != NULL){
+				if(actual->sig_auxiliar->dato->ficha[actual->dato->salida] >= nodo->dato->ficha[nodo->dato->salida]){
+					nodo->sig_auxiliar = actual->sig_auxiliar;
+					actual->sig_auxiliar = nodo;
+					actual = lista->ultimo;
+				}
+				actual = actual->sig_auxiliar;
+			}
+		}/**
 		lista->ultimo->sig_auxiliar = nodo;
-		lista->ultimo = nodo;
+		lista->ultimo = nodo;**/
 	}
 }
+
 void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo**/
     if(actual != NULL){/** esta condicion evita la recursividad "infinita" **/
 		/**si la ficha es libre y no este cruzada y no este cruzada osea es 0 entoces revisa todos
