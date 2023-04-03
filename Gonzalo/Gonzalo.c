@@ -18,3 +18,10 @@ int main(){
    
     return 0;
 }
+/**	
+*   -buscarDondeColocarFicha: evalï¿½a todas las opciones donde es posible colocar la 
+*	-ficha y la deja en aquella posiciï¿½n en la que el contador de puntos sea un mï¿½ltiplo 
+*	-de 5. Para ello debe contar los valores acumulados en todas las puntas, y se asigna 
+*	-un punto por cada mï¿½ltiplo de 5. Es decir si el total de la suma es 35 el jugador x 
+*	-acumula 7 puntos.
+**/
