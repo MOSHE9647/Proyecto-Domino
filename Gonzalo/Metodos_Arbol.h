@@ -74,7 +74,8 @@ void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccio
 }
 /**
  * metodo prinsipal que se llamara fuera de este archivo
- * 
+ * la direccion es = 2 en caso de que la ficha destion osea la ficha en la mesa
+ * a la cual colocara la nueva es no par
  **/
 void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
 	Nodo *nuevo = CreandoNodo(domino);// crea el nodo apartir del la ficha recibida
@@ -151,6 +152,20 @@ Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
 		Buscando_fichas_disponibles(lista, mesa->raiz->anterior);
 	  }
 	  return lista; // si retorna NULL es por que no hay nada en la mesa
+}
+
+/** ESTE METODO HACE QUE LOS NODOS NO DEJEN RASTRO DE LA LISTA YA QUE AL SER INGRESADAS AL
+ *  DE NO USARSE PERJUDICARA LAS LISTAS FUTURAS
+ * **/
+void Liberar_Lista(Lista *lista){
+	if(lista->primero != NULL){
+		while (lista->primero!=NULL){
+			Nodo *auxiliar = lista->primero;
+			lista->primero = lista->primero->sig_auxiliar;
+			auxiliar->sig_auxiliar = NULL;
+		}
+		lista->ultimo = NULL;
+	}
 }
 /**
  * Aquie en  adelante van los metodos de mostreo
