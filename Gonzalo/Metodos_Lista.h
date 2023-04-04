@@ -30,7 +30,7 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 	}
 }
 
-void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo**/
+void Buscando_fichas_disponibles(Lista *lista, Nodo *actual){/**Metodo recursivo**/
     if(actual != NULL){
 		if(actual->dato->valores[0] == actual->dato->valores[1] && actual->cruzado == 0){
 			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL)
@@ -45,7 +45,7 @@ void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo*
 }
 
 Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
-	Lista* lista = NULL;
+	//Lista* lista = NULL;
 	  if(mesa->raiz != NULL){
       	lista = (Lista*)calloc(sizeof(Lista),1);
 		/**---REVISA QUE LA PRIMERA FICHA RAIZ ESTE LIBRE-----**/
@@ -80,4 +80,20 @@ void Liberar_Lista(Lista *lista){
 		lista->ultimo = NULL;
 	}
 }
+
+void Mostrar_Lista(Lista *l){
+    if(l->primero != NULL){
+        Nodo *actual = l->primero;
+        while (actual != NULL){
+            int salida = actual->dato->salida;
+            if(salida == 0){
+                printf("[ %d | %d ]\n",actual->dato->valores[0],actual->dato->valores[1]);
+            }else{
+                printf("[ %d | %d ]\n",actual->dato->valores[1],actual->dato->valores[0]);
+            }
+            actual = actual->sig_auxiliar;
+        }
+    }
+}
+
 #endif

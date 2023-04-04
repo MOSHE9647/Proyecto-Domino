@@ -16,7 +16,34 @@
 #include "Metodos_Lista.h"
 
 int main(){
-   
+    Nodo *n1 = (Nodo *)calloc(sizeof(Nodo),1);
+    n1->dato = (Ficha *)calloc(sizeof(Ficha),1);
+    n1->dato->valores[0] = 0;
+    n1->dato->valores[1] = 3;
+    n1->dato->salida = 1;
+
+    Nodo *n2 = (Nodo *)calloc(sizeof(Nodo),1);
+    n2->dato = (Ficha *)calloc(sizeof(Ficha),1);
+    n2->dato->valores[0] = 2;
+    n2->dato->valores[1] = 5;
+    n2->dato->salida = 1;
+    
+    Nodo *n3 = (Nodo *)calloc(sizeof(Nodo),1);
+    n3->dato = (Ficha *)calloc(sizeof(Ficha),1);
+    n3->dato->valores[0] = 0;
+    n3->dato->valores[1] = 0;
+    n3->dato->salida = 0;
+    Lista *l = (Lista *)calloc(sizeof(Lista),1);
+    ingresar_Lista(l,n1);
+    ingresar_Lista(l,n2);
+    ingresar_Lista(l,n3);
+    Mostrar_Lista(l);
+    Liberar_Lista(l);
+
+    if(n3->sig_auxiliar == NULL){
+        printf("Esta nulo\n");
+    }
+
     return 0;
 }
 /**	
