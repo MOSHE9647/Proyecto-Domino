@@ -59,9 +59,9 @@ int crearFichas () {
     int contador = 0;   /* Contador para la cantidad de Fichas creadas       */
 
     for (int i = 0; i <= 6; i++) {
-        for (int j = 0; j <= 6; j++) {
+        for (int j = i; j <= 6; j++) {
             // Con esto nos aseguramos de que no se repitan fichas:
-            if (j >= i) {
+            //if (j >= i) { /**ISAAC PUEDES ELIMINAR ESTA CONDICIONAL HE INICIAR "j = i" en el for y se ahorra esto**/
                 fichas = realloc(fichas, (contador + 1) * sizeof(Ficha));   /* Asignamos Memoria a Fichas    */
                 temp = calloc(sizeof(Ficha), 1);                            /* Asignamos Memoria al auxiliar */
                 temp->valores[0] = i;                                       /* Asignamos 'i' como valor izq  */
@@ -70,7 +70,7 @@ int crearFichas () {
                 memcpy(&fichas[contador], temp, sizeof(Ficha));             /* La ponemos en el Vector       */
                 free(temp);                                                 /* Liberamos la memoria          */
                 contador++;                                                 /* Aumentamos el contador        */
-            }
+            //}
         }
     }
     return fichas != NULL ? TRUE : FALSE;
