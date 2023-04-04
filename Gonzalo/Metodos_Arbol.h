@@ -15,22 +15,22 @@ Nodo* CreandoNodo(Ficha *domino){
 /**guarda cual es el lado de la ficha que esta disponible para la siguiente ronda**/
 void determinando_salida(Nodo *actual, Nodo *nuevo){
 	int salida = actual->dato->salida;
-	if(actual->dato->ficha[salida] == nuevo->dato->ficha[0]){
+	if(actual->dato->valores[salida] == nuevo->dato->valores[0]){
         nuevo->dato->salida = 1;
-	}else if(actual->dato->ficha[salida] == nuevo->dato->ficha[1]){
+	}else if(actual->dato->valores[salida] == nuevo->dato->valores[1]){
 		nuevo->dato->salida = 0;
 	}
 }
 
 void Guardando_Nodo(Nodo *actual, Nodo* nuevo, int direccion){
 	if(actual != NULL){
-		if(actual->dato->ficha[0] != actual->dato->ficha[1]){
+		if(actual->dato->valores[0] != actual->dato->valores[1]){
 			if(actual->siguiente == NULL){
 				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
 				actual->siguiente = nuevo;
 			}
-		}else if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 0){
+		}else if(actual->dato->valores[0] == actual->dato->valores[1] && actual->cruzado == 0){
 			if(actual->arriba == NULL && direccion == 1){
 				determinando_salida(actual, nuevo);
 				nuevo->anterior = actual;
@@ -65,7 +65,7 @@ void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccio
 		if(actual == destino)
 			Guardando_Nodo(actual, nuevo, direccion);
 	}else{
-		if(actual->dato->ficha[0] == actual->dato->ficha[1]){
+		if(actual->dato->valores[0] == actual->dato->valores[1]){
 			asignacion_recursivo(actual->arriba, nuevo, destino, direccion);
 			asignacion_recursivo(actual->abajo, nuevo, destino, direccion);
 		}
@@ -97,41 +97,35 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 		lista->primero = nodo;
 		lista->ultimo = nodo; 
 	}else{
-		if(lista->primero->dato->ficha[lista->primero->dato->salida] >= nodo->dato->ficha[nodo->dato->salida]){
+		if(lista->primero->dato->valores[lista->primero->dato->salida] >= nodo->dato->valores[nodo->dato->salida]){
 			nodo->sig_auxiliar = lista->primero;
 			lista->primero = nodo;
-		}else if(lista->ultimo->dato->ficha[lista->primero->dato->salida] <= nodo->dato->ficha[nodo->dato->salida]){
+		}else if(lista->ultimo->dato->valores[lista->primero->dato->salida] <= nodo->dato->valores[nodo->dato->salida]){
 			lista->ultimo->sig_auxiliar = nodo;
 			lista->ultimo = nodo;
 		}else{
 
 			Nodo *actual = lista->primero;
 			while (actual->sig_auxiliar != NULL){
-				if(actual->sig_auxiliar->dato->ficha[actual->dato->salida] >= nodo->dato->ficha[nodo->dato->salida]){
+				if(actual->sig_auxiliar->dato->valores[actual->dato->salida] >= nodo->dato->valores[nodo->dato->salida]){
 					nodo->sig_auxiliar = actual->sig_auxiliar;
 					actual->sig_auxiliar = nodo;
 					actual = lista->ultimo;
 				}
 				actual = actual->sig_auxiliar;
 			}
-		}/**
-		lista->ultimo->sig_auxiliar = nodo;
-		lista->ultimo = nodo;**/
+		}
 	}
 }
 
 void Buscando_fichas_disponibles(Lista *lista,Nodo *actual){/**Metodo recursivo**/
-    if(actual != NULL){/** esta condicion evita la recursividad "infinita" **/
-		/**si la ficha es libre y no este cruzada osea es 0 entoces revisa todos
-		 * sus lados en busca de una salida libre para tomarlo como siguiente ficha disponible
-		 * de lo contrario sera tomada como ficha ordinaria
-		 * **/
-		if(actual->dato->ficha[0] == actual->dato->ficha[1] && actual->cruzado == 0)
+    if(actual != NULL){
+		if(actual->dato->valores[0] == actual->dato->valores[1] && actual->cruzado == 0){
 			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL)
 				ingresar_Lista(lista, actual);
-		else if(actual->siguiente == NULL)
+		}else if(actual->siguiente == NULL){
 				ingresar_Lista(lista, actual);
-
+		}
 		Buscando_fichas_disponibles(lista, actual->siguiente);
 		Buscando_fichas_disponibles(lista, actual->arriba);
 		Buscando_fichas_disponibles(lista, actual->abajo);
@@ -164,7 +158,7 @@ Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
  **/
 void muestra_Recursivo(Nodo *actual){
    if(actual != NULL){
-      printf("[ %d | %d ]\n",actual->dato->ficha[0],actual->dato->ficha[1]);
+      printf("[ %d | %d ]\n",actual->dato->valores[0],actual->dato->valores[1]);
       printf("\nsiguiente\n");
       muestra_Recursivo(actual->siguiente);
       printf("\narriba\n");

@@ -6,7 +6,7 @@ typedef struct Nodo Nodo;
 typedef struct Lista Lista;
 
 struct Ficha{
-      int ficha[2];
+      int valores[2];
 	  int salida;
 };
 
