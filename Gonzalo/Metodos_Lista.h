@@ -5,6 +5,7 @@
  * de una manera ordenada jejej
  **/
 void ingresar_Lista(Lista *lista, Nodo* nodo){
+    printf("Agregandos......\n");
 	if(lista->primero == NULL){
 		lista->primero = nodo;
 		lista->ultimo = nodo; 
@@ -16,15 +17,22 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 			lista->ultimo->sig_auxiliar = nodo;
 			lista->ultimo = nodo;
 		}else{
-
 			Nodo *actual = lista->primero;
-			while (actual->sig_auxiliar != NULL){
-				if(actual->sig_auxiliar->dato->valores[actual->dato->salida] >= nodo->dato->valores[nodo->dato->salida]){
-					nodo->sig_auxiliar = actual->sig_auxiliar;
+            int salida =nodo->dato->salida;
+            printf("entrando al while 1\n");
+			while (actual != NULL){
+                int auxiliar = actual->dato->salida;
+				if(nodo->dato->valores[salida] <= actual->sig_auxiliar->dato->valores[auxiliar]){
+                    printf("Error 1\n");
+                    nodo->sig_auxiliar = actual->sig_auxiliar;
+                    printf("Error 2\n");
 					actual->sig_auxiliar = nodo;
-					actual = lista->ultimo;
+                    printf("Error 3\n");
+                    actual = lista->ultimo;
+                    printf("Error 4\n");
 				}
 				actual = actual->sig_auxiliar;
+                printf("Error 5\n");
 			}
 		}
 	}

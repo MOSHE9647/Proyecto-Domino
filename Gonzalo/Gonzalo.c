@@ -32,11 +32,20 @@ int main(){
     n3->dato = (Ficha *)calloc(sizeof(Ficha),1);
     n3->dato->valores[0] = 0;
     n3->dato->valores[1] = 0;
-    n3->dato->salida = 0;
+    n3->dato->salida = 1;
+
+    Nodo *n4 = (Nodo *)calloc(sizeof(Nodo),1);
+    n4->dato = (Ficha *)calloc(sizeof(Ficha),1);
+    n4->dato->valores[0] = 3;
+    n4->dato->valores[1] = 6;
+    n4->dato->salida = 0;
+
+
     Lista *l = (Lista *)calloc(sizeof(Lista),1);
     ingresar_Lista(l,n1);
     ingresar_Lista(l,n2);
     ingresar_Lista(l,n3);
+    ingresar_Lista(l,n4);
     Mostrar_Lista(l);
     Liberar_Lista(l);
 
