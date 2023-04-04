@@ -3,3 +3,5 @@
     gcc -o Jason Jason.c --> Esto para tener un orden al momento de crear los ejecutables
     ./Jason --> Comando para ejecutar el programa
 */
+
+//hola como estan
