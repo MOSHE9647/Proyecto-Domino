@@ -5,7 +5,6 @@
  * de una manera ordenada jejej
  **/
 void ingresar_Lista(Lista *lista, Nodo* nodo){
-    printf("Agregandos......\n");
 	if(lista->primero == NULL){
 		lista->primero = nodo;
 		lista->ultimo = nodo; 
@@ -18,21 +17,15 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 			lista->ultimo = nodo;
 		}else{
 			Nodo *actual = lista->primero;
-            int salida =nodo->dato->salida;
-            printf("entrando al while 1\n");
+            int salida = nodo->dato->salida;
 			while (actual != NULL){
                 int auxiliar = actual->dato->salida;
 				if(nodo->dato->valores[salida] <= actual->sig_auxiliar->dato->valores[auxiliar]){
-                    printf("Error 1\n");
                     nodo->sig_auxiliar = actual->sig_auxiliar;
-                    printf("Error 2\n");
 					actual->sig_auxiliar = nodo;
-                    printf("Error 3\n");
                     actual = lista->ultimo;
-                    printf("Error 4\n");
 				}
 				actual = actual->sig_auxiliar;
-                printf("Error 5\n");
 			}
 		}
 	}
@@ -73,8 +66,9 @@ Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
 	  return lista; // si retorna NULL es por que no hay nada en la mesa
 }
 
-/** ESTE METODO HACE QUE LOS NODOS NO DEJEN RASTRO DE LA LISTA YA QUE AL SER INGRESADAS AL
- *  DE NO USARSE PERJUDICARA LAS LISTAS FUTURAS, POR ESO SIEMPRE QUE EL 
+/** ESTE METODO HACE QUE LOS NODOS NO DEJEN RASTRO DE LA LISTA YA QUE AL SER INGRESADAS ESOS
+ *  ESPACIOS GUARDAN REFERENCIA LAS CUALES DEBES LIMBIARES OJO LIMPIAR EL PUNTERO NO LIBERAR EL ESPACIO
+ *  DE MEMORIA AL DE NO USARSE PERJUDICARA LAS LISTAS FUTURAS, POR ESO SIEMPRE QUE EL 
  *  JUGADOR YA HAYASE AGREGADO, ELEGIDO LA FICHA SE DEBE USAR ESTE METODO PARA NO DEJAR REFERENCIAS
  * 	EN LOS NODOS DEL ARBOL (nodo->sig_auxiliar != NULL):
  * **/

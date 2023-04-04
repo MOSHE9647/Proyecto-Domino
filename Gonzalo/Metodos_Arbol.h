@@ -8,7 +8,7 @@
  * desea colocar la ficha siguiente "direccion" 1 arriba, 2 siguiente 3 abajo 0 en caso de que sea raiz
  **/
 Nodo* CreandoNodo(Ficha *domino){
-	Nodo *nuevo = (Ficha *)calloc(sizeof(Ficha),1);
+	Nodo *nuevo = (Nodo *)calloc(sizeof(Nodo),1);
 	nuevo->dato = domino;
 	return nuevo;
 }
