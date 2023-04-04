@@ -61,7 +61,7 @@ int crearFichas () {
     for (int i = 0; i <= 6; i++) {
         for (int j = 0; j <= 6; j++) {
             // Con esto nos aseguramos de que no se repitan fichas:
-            if (j >= i) { /**ISAAC PUEDES ELIMINAR ESTA CONDICIONAL EN INICIAR "j = i"  y se ahorra esto**/
+            if (j >= i) { /**ISAAC PUEDES ELIMINAR ESTA CONDICIONAL HE INICIAR "j = i" en el for y se ahorra esto**/
                 fichas = realloc(fichas, (contador + 1) * sizeof(Ficha));   /* Asignamos Memoria a Fichas    */
                 temp = calloc(sizeof(Ficha), 1);                            /* Asignamos Memoria al auxiliar */
                 temp->valores[0] = i;                                       /* Asignamos 'i' como valor izq  */
