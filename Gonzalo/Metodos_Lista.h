@@ -57,7 +57,7 @@ Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
 		 * entoces lo guardara en en la condicion if linea 108 y 109
 		 * por lo que no hace falta pasarlo al buscando_fichas disponible()
 		 * y en el tal caso de que no cumpla no afectara ya que no cumplira con los requisitos
-		 * **/
+		 **/
 		Buscando_fichas_disponibles(lista, mesa->raiz->arriba);
 		Buscando_fichas_disponibles(lista, mesa->raiz->abajo);
 		Buscando_fichas_disponibles(lista, mesa->raiz->siguiente);
