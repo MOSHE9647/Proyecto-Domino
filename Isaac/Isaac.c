@@ -31,7 +31,7 @@ typedef struct {
 
 // Variables Globales:
 Jugador jugadores[MAX_JUG]; /* Vector para almacenar cada uno de los Jugadores              */
-Ficha *fichas = NULL;       /* Vector Dinámico de para almacenar las Fichas                 */
+Ficha *fichas = NULL;       /* Vector Dinámico para almacenar las Fichas                    */
 int canJug = 0;             /* Variable para almacenar la cantidad de jugadores por partida */
 
 // Declaracion de las Funciones a utilizar dentro del Juego:
@@ -46,9 +46,6 @@ int main () {
     // Agregar opción: '3. Continuar'
     if (crearFichas()) { printf ("Se crearon las Fichas.\n"); }
     else { printf ("No se pudieron crear las Fichas.\n"); }
-
-
-    // Comentario de Prueba
 
     repartirFichas();
 
