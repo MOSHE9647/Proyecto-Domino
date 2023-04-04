@@ -137,7 +137,7 @@ Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
 	Lista* lista = NULL;
 	  if(mesa->raiz != NULL){
       	lista = (Lista*)calloc(sizeof(Lista),1);
-		/**---REVISA QUE LA PRIMERA FICHA ESTE LIBRE-----**/
+		/**---REVISA QUE LA PRIMERA FICHA RAIZ ESTE LIBRE-----**/
 		if(mesa->raiz->siguiente == NULL || mesa->raiz->anterior == NULL || mesa->raiz->arriba == NULL || mesa->raiz->abajo == NULL){
 			ingresar_Lista(lista,mesa->raiz);
 		}
@@ -155,7 +155,9 @@ Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
 }
 
 /** ESTE METODO HACE QUE LOS NODOS NO DEJEN RASTRO DE LA LISTA YA QUE AL SER INGRESADAS AL
- *  DE NO USARSE PERJUDICARA LAS LISTAS FUTURAS
+ *  DE NO USARSE PERJUDICARA LAS LISTAS FUTURAS, POR ESO SIEMPRE QUE EL 
+ *  JUGADOR YA HAYASE AGREGADO, ELEGIDO LA FICHA SE DEBE USAR ESTE METODO PARA NO DEJAR REFERENCIAS
+ * 	EN LOS NODOS DEL ARBOL (nodo->sig_auxiliar != NULL):
  * **/
 void Liberar_Lista(Lista *lista){
 	if(lista->primero != NULL){
