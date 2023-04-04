@@ -13,6 +13,7 @@
 #include "Estructura.h"
 #include "Arbol.h"
 #include "Metodos_Arbol.h"
+#include "Metodos_Lista.h"
 
 int main(){
    
