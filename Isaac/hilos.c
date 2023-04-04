@@ -4,11 +4,11 @@
 #include <semaphore.h>
 
 /******************************************************************************
-    Este archivo es un ejemplo que podemos utilizar para el uso de semáforos
-    en el juego. A mi parecer se ve bastante sencillo y lo podemos usar para
-    controlar todas las acciones que vayan a realizar los jugadores dentro
-    del juego.
-********************************************************************************/
+   Este archivo es un ejemplo que podemos utilizar para el uso de semáforos
+   en el juego. A mi parecer se ve bastante sencillo y lo podemos usar para
+   controlar todas las acciones que vayan a realizar los jugadores dentro
+   del juego.
+*******************************************************************************/
 
 sem_t game_table; // semáforo para la mesa de juego
 sem_t chip_basket; // semáforo para la canasta de fichas
