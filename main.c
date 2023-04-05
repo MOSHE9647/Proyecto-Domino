@@ -1,266 +1,197 @@
-/*
-    Archivo de Trabajo del Proyecto. Aquí vamos a unir todo lo que hayamos hecho del proyecto
-    Compilar este archivo con el siguiente comando: 
-    gcc main.c --> Esto para tener un orden al momento de crear los ejecutables
-    ./main     --> Comando para ejecutar el programa
-*/
+#include <string.h>         /* Para uso de la función 'strcpy' */
+#include <stdlib.h>         /* Para uso de Memoria Dinámica    */
+#include <unistd.h>         /* Para funciones propias de Linux */
+#include <stdio.h>          /* Entrada y Salida Estándar de C  */
+#include <time.h>           /* Para uso de Números Aleatorios  */
 
-#include <stdio.h>        /* Entrada y Salida Estándar */
-#include <string.h>       /* Para usar 'strncpy'       */
-#include <stdlib.h>       /* Librería Estándar         */
-#include <stdbool.h>      /* Para el uso de Booleanos  */
-#include <unistd.h>
-#include <time.h>         /* Para números aleatorios   */
+#define ARCHIVO "log.txt"   /* Ubicación del Registro del Programa    */
+#define CHAR_LIMIT 1024     /* Límite de carácteres para nombres      */
+#define MAX_PLAYERS 7       /* Número Máximo de Jugadores por partida */
+#define MAX_COMER 10        /* Tamaño máximo de las Fichas para Comer */
+#define MAX_TILES 9         /* Cantidad máxima de Fichas por Jugador  */
+#define DOMINO 28           /* Cantidad de Fichas que posee el Juego  */
+#define FALSE 0             /* Creamos el tipo Booleano False = 0     */
+#define TRUE 1              /* Creamos el tipo Booleano True = 1      */ 
 
-#define ARCHIVO_TXT "log.txt"    /* Definición de la ruta de acceso al archivo 'log.txt'        */
-#define CHAR_LIMIT 1024          /* Límite de Carácteres para los Nombres y Lectura de Archivos */
-#define MAX_PLAYERS 7            /* Cantidad Maxima de Jugadores que admite el Juego            */
-#define DOMINO 28                /* Cantidad máxima de fichas que posee el juego                */
-
-/* 
-    Si les marca error con las variables o funciones de tipo 'bool',
-    eliminen la librería '<stdbool.h>' y descomenten los siguientes #define,
-    luego cambien el tipo 'bool' de las funciones por el tipo 'int'
-*/
-
-// #define true 1         
-// #define false 0
-
-// Estructura para las Fichas:
+/* ESTRUCTURA DE FICHA */
 typedef struct {
-    int valores[2]; /* Cada número que posee la ficha [a|b] */
-    int numFicha    /* Variable para conocer la posicion y reordenar las fichas */
+    int valores[2];         /* Valores que tiene la Ficha ( [Izq|Der] )     */
+    int salida;             /* Variable para obtener la 'punta' de la Ficha */
+    int numFicha;           /* Variable para el ordenamiento de las fichas  */
 } Ficha;
 
-// Estructura para crear a los jugadores:
+/* ESTRUCTURA DE JUGADOR */
 typedef struct {
-    /* 
-        Estas variables hay que cambiarlas por 
-        las variables que pide el Proyecto    
-    */
-    char nombre[CHAR_LIMIT];    
-    int edad;
-    int ID;
+    char nom[CHAR_LIMIT];   /* Variable que guarda el Nombre del Jugador           */
+    Ficha mazo[MAX_TILES];  /* Vector del Mazo para las Fichas del Jugador         */
+    int totalGanados;       /* Cantidad de Juegos Ganados que lleva cada Jugador   */
+    int totalPuntos;        /* Cantidad total de puntos que posee cada Jugador     */
+    int puntos;             /* Cantidad de puntos que lleva el Jugador por partida */
 } Jugador;
 
-// Variables Globales:
-Jugador jugadores[MAX_PLAYERS]; /* Vector de Jugadores                                          */
-Ficha *fichas = NULL;           /* Vector Dinámico de Fichas                                    */
-int posFicha = 1;               /* Variable para reordenar las fichas con el método de Burbuja  */
-int canJug = 0;                 /* Variable para almacenar la cantidad de jugadores por partida */
+/* VARIABLES GLOBALES */
+Ficha listaFichasParaComer[MAX_COMER];  /* Lista de las Fichas para Comer           */
+Jugador jugadores[MAX_PLAYERS];         /* Lista de Jugadores por partida           */
+Ficha listaMazoTotal[DOMINO];           /* Lista de todas las Fichas del Juego      */
+int totalFichas = DOMINO;               /* Para Manejo de Vectores en el Juego      */
+int canFichasJug = 0;                   /* Cantidad de Fichas que hay por Jugador   */
+int canMazoJug = 0;                     /* Cantidad de Fichas para cada Jugador     */
+int canJug = 0;                         /* Cantidad de Jugadores por partida        */
 
-// Declaración de las funciones a utilizar dentro del Código:
-void iniciarJuego();                        /* Funcion donde se solicitan los datos iniciales   */
-Ficha *crearFicha (int a, int b);           /* Funcion que crea las fichas al iniciar el juego  */
-Jugador *crearJugador (Jugador *j);         /* Funcion que crea a los Jugadores                 */
-void imprimir(Jugador *j, int i);           /* Funcion para mostrar la información del Jugador  */
-void escribir(Jugador *j);                  /* Funcion para escribir en un archivo txt          */
-void leer ();                     /* Funcion para leer de un archivo txt              */
-void revolver(Ficha *fichas, int size);     /* Funcion que revuelve todas las fichas            */
-void ordenar(Ficha *fichas, int longitud);  /* Funcion para ordenar las fichas del juego y maso */
-void systemPause();                         /* Funcion para pausar la pantalla                  */
+/* LISTA DE FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
+void revolverFichas (Ficha f[], int size);
+void ordenarFichas (Ficha f[], int size);
+void delElement (Ficha f[], int pos);
+void inicializarFichas ();
+void repartirFichas ();
+void crearJugadores ();
+int verificarDobles ();
+/* FUNCION DE PRUEBA */
+void imprimir();
 
-/* Inico: Funcion Principal del Programa */
+/* FUNCIÓN MAIN */
 int main () {
-    int opc;
-	do {
-        opc = 0;
-		printf ("\n\t╔════════╣ JUEGO DOMINO ╠════════╗\n");
-		printf ("\t║                                ║\n");
-		printf ("\t║         1. Juego Nuevo         ║\n");
-		printf ("\t║         2. Puntuaciones        ║\n");
-		printf ("\t║         3. Salir               ║\n");
-		printf ("\t║                                ║\n");
-		printf ("\t╚════════════════════════════════╝\n");
-		printf ("\t       Digite una Opcion: ");
-		scanf ("%d", &opc);
 
-		switch (opc) {
-			case 1:
-				iniciarJuego();
-                break;
-            case 2:
-                leer();
-                systemPause();
-                break;
-            case 3:
-                return 0;
-                break;
-            default:
-                system("clear");
-                printf ("\tOpcion Invalida...\n");
-                printf ("\tDigite una Opción Válida.\n\n");
-                break;
-		}
-        system("clear");
-	} while (opc != 3);
+    repartirFichas ();
+    imprimir ();
 
+    // for (int i = 0; i < DOMINO; i++) {
+    //     printf ("#%i:\t[%i|%i]\n", i + 1, listaMazoTotal[i].valores[0], listaMazoTotal[i].valores[1]);
+    // }
     return 0;
 }
-/* Fin: Funcion Principal del Programa */
 
-/* Aquí creamos las Funciones que vamos a utilizar dentro del Código */
-// Creamos las Fichas:
-Ficha *crearFicha (int a, int b) {
-    Ficha *nueva = calloc(sizeof(Ficha), 1); /* Variable auxiliar para crear las fichas */
-    nueva->valores[0] = a;                   /* Asignamos 'a'                           */
-    nueva->valores[1] = b;                   /* Asignamos 'b'                           */
-    nueva->numFicha = posFicha;              /* Le damos un Número a la Ficha           */
-    posFicha++;                              /* Aumentamos ese numero                   */
-    return nueva;                            /* Retornamos la Nueva Ficha               */
-}
+/* DESARROLLO DE FUNCIONES */
+// Función para Repartir Fichas:
+void repartirFichas () {
+    /* PEDIMOS CANTIDAD DE JUGADORES Y LOS CREAMOS */
+    // ** CTRL + Click para ir a la función ** //
+    crearJugadores ();
+    
+    /* DIVIDIMOS LA CANTIDAD DE FICHAS */
+    canFichasJug = DOMINO / (canJug + 1);           /* Cantidad de Fichas a Repartir */
 
-// Creamos a los Jugadores:
-Jugador *crearJugador(Jugador *j) {
-    /* 
-        Estas variables hay que cambiarlas por 
-        las variables que pide el Proyecto:
-    */
-    char nom[CHAR_LIMIT];
-    int edad = 0, ID = 0;
-
-    // Solicitamos los Datos al Usuario y Asignamos las Variables:
-    printf ("Digite su Nombre: ");
-    scanf ("%s", j->nombre);
-    printf ("Digite su Edad: ");
-    scanf ("%d", &j->edad);
-    printf ("Digite su ID: ");
-    scanf ("%d", &j->ID);    
-}
-
-void iniciarJuego() {
-    // Creamos las Fichas para el Juego:
-    Ficha *temp;        /* Variable temporal para crear las fichas del Juego */
-    int contador = 0;   /* Contador para la cantidad de Fichas creadas       */
-
-    for (int i = 0; i <= 6; i++) {
-        for (int j = 0; j <= 6; j++) {
-            if (j >= i) {
-                /* Le asignamos la memoria al Vector Dinámico: */
-                fichas = realloc(fichas, (contador + 1) * sizeof(Ficha));
-                temp = crearFicha(i, j);                        /* Creamos la ficha        */
-                memcpy(&fichas[contador], temp, sizeof(Ficha)); /* La ponemos en el Vector */
-                free(temp);                                     /* Liberamos la memoria    */
-                contador++;                                     /* Aumentamos el contador  */
+    /* REVOLVEMOS LAS FICHAS Y LAS REPARTIMOS */
+    do {
+        inicializarFichas ();
+        revolverFichas (listaMazoTotal, DOMINO);
+        for (int i = 0; i < canJug; i++) {
+            for (int j = 0; j < canFichasJug; j++) {
+                jugadores[i].mazo[j] = listaMazoTotal[0];
+                delElement(listaMazoTotal, 0);
             }
+            ordenarFichas (jugadores[i].mazo, canFichasJug);
+        }
+    } while (verificarDobles () == TRUE);
+
+    printf ("Valor verificarDobles:\t%i\n\n", verificarDobles ());
+
+    /* ASIGNAMOS EL RESTO DE FICHAS A LA LISTA 'listaFichasParaComer' */
+    for (int i = 0; i < totalFichas; i++) { listaFichasParaComer[i] = listaMazoTotal[i]; }
+    ordenarFichas (listaFichasParaComer, totalFichas);
+}
+
+// Función para Inicializar las Fichas:
+void inicializarFichas () {
+    int numFicha = 0;
+    for (int i = 0; i <= 6; i++) {
+        for (int j = i; j <= 6 ; j++) {
+            listaMazoTotal[numFicha].numFicha = numFicha + 1;
+            listaMazoTotal[numFicha].valores[0] = i;
+            listaMazoTotal[numFicha].valores[1] = j;
+            listaMazoTotal[numFicha].salida = 0;
+            numFicha ++;
         }
     }
+}
 
-    // Solicitamos la Cantidad de Jugadores:
-    printf ("Digite el Número de Jugadores: ");
-    scanf ("%d", &canJug);
+// Función para Crear a los Jugadores:
+void crearJugadores () {
+    //AQUÍ HAY QUE VERIFICAR 'log.txt'
+    
+    /* SOLICITAMOS LA CANTIDAD DE JUGADORES */
+    printf ("Digite la Cantidad de Jugadores\n-> ");
+    scanf ("%i", &canJug);
 
-    // Solicitamos los Datos y creamos a los Jugadores:
+    /* CREAMOS A LOS JUGADORES */
     for (int i = 0; i < canJug; i++) {
-        system ("clear"); /* Limpia Pantalla */
-        printf ("Datos del Jugador %d:\n\n", i+1);
-        crearJugador(&jugadores[i]);
+        system ("clear");           /* Limpiamos la Pantalla del Terminal  */
+
+        /* SOLICITAMOS EL NOMBRE DE CADA JUGADOR */
+        printf ("Digite el nombre del Jugador %i\n-> ", i + 1);
+        scanf ("%s", jugadores[i].nom);
     }
 }
 
-void imprimir(Jugador *j, int i) {
-    /* Esta información también hay que cambiarla */
-    // Mostramos los datos del Jugador correpondiente:
-    printf ("Datos del Jugador %d:\n", i+1);
-    printf ("Nombre:\t%s\n", j->nombre);
-    printf ("Edad:\t%d\n", j->edad);
-    printf ("ID:\t%d\n\n", j->ID);
-}
-
-void escribir (Jugador *j) {
-    FILE* archivo;      /* Variable que apunta al Archivo que vamos a utilizar */
-    /* 
-        Las siguientes variables hay que cambiarlas por 
-        las variables que pide el Proyecto:
-    */
-	char Edad[CHAR_LIMIT];  /* Variable para almacenar la edad en formato string   */
-	char ID[CHAR_LIMIT];    /* Variable para almacenar la ID en formato string     */
-
-	archivo = fopen(ARCHIVO_TXT, "a"); /* Abrimos el archivo en modo escritura sin sobreescribir */
-
-    // Verificamos que se haya leído el archivo:
-	if (archivo == NULL) {
-		printf("Error al abrir el archivo.");
-        return;                       /* No se leyó correctamente */
-	} else {
-		sprintf (Edad, "%d", j[0].edad);    /* Convertimos edad de 'int' a 'string' */
-		sprintf (ID, "%d", j[0].ID);        /* Convertimos ID de 'int' a 'string'   */
-        
-        /* Escribimos la información de las variables en el archivo */
-		fputs (j->nombre, archivo); fputs ("\n", archivo);
-		fputs (Edad, archivo);      fputs ("\n", archivo);
-		fputs (ID, archivo);        fputs ("\n", archivo);
-	}
-
-	fclose (archivo);                       /* Cerramos el archivo   */
-}
-
-/* No sé si esta función sea necesaria */
-void leer () {
-	FILE *archivo;                   /* Variable que apunta al Archivo que vamos a utilizar */
-	archivo = fopen(ARCHIVO_TXT, "r"); /* Abrimos el archivo en Modo Lectura */
-	
-    char nombre[CHAR_LIMIT];         /* Variable que almacena el nombre en formato string */
-	int edad;
-	int ID;
-
-    // Verificamos que se haya leído el archivo:
-	if (archivo == NULL) {
-		/* Mostramos un mensaje de Error: */
-        system ("clear");
-		printf("Error al abrir el archivo.\n");
-        printf("Revise el nombre del archivo e intentelo nuevamente.\n\n");
-		return;  /* No se leyó correctamente */
-	}
-    /* 
-        Leemos el archivo y almacenamos lo leído en sus
-        respectivas variables: 
-    */
-	while (!feof(archivo)) {
-        fscanf (archivo, "%s %d %d", nombre, &edad, &ID);
-    }
-
-    /* Descomenten esto para probar si funciona: */
-	//printf ("Nombre:\t%sEdad:\t%d\nID:\t%d", j->nombre, j->edad, j->ID);
-    printf ("Nombre:\t%s\nEdad:\t%d\nID:\t%d\n\n", nombre, edad, ID);
-	fclose(archivo);    /* Cerramos el archivo   */
-}
-
-void revolver (Ficha *fichas, int size) {
-    /*
+// Función para Revolver las Fichas:
+void revolverFichas (Ficha f[], int size) {
+    /*******************************************************
         Revolvemos las fichas intercambiandolas de lugar
         de forma aleatoria utilizando la funcion 'rand()'
-    */
-    srand(time(NULL));  /* Semilla para los números aleatorios */
+    ********************************************************/
+    srand(time(NULL)); // <- SEMILLA
     for (int i = 0; i < size; i++) {
-        /* Realizamos el Intercambio */
-        int j = rand() % size;  /* Variable con las posiciones a intercambiar  */
-        Ficha temp = fichas[i]; /* Variable auxiliar para realizar el cambio   */
-        fichas[i] = fichas[j];
-        fichas[j] = temp;
+        int aux = rand () % size;       /* Auxiliar para tener una posición aleatoria     */
+        Ficha temp = f[i];              /* Auxiliar Temporal para Realizar el Intercambio */
+        // INTERCAMBIAMOS POSICIONES:
+        f[i] = f[aux];
+        f[aux] = temp;
     }
 }
 
-void ordenar (Ficha *fichas, int longitud) {
-    /* Ordenamiento por Método de la Burbuja */
-    for (int i = 0; i < longitud; i++) {
-        for (int actual = 0; actual < longitud - 1; actual++) {
-            int siguiente = actual + 1;
-            /*
-                Si el actual es mayor que el que le sigue a la derecha intercambiamos, es decir,
+// Función para Ordenar las Fichas:
+void ordenarFichas (Ficha f[], int size) {
+    /* ORDENAMOS CON EL MÉTODO DE LA BURBUJA */
+    for (int i = 0; i < size; i++) {
+        for (int actual = 0; actual < size - 1; actual++) {
+            int sig = actual + 1;
+            /************************************************************************
+                Si el 'actual' es mayor que 'siguiente', intercambiamos. Es decir,
                 movemos el actual a la derecha y el de la derecha al actual:
-            */
-            if (fichas[actual].numFicha > fichas[siguiente].numFicha) {
-                Ficha temporal = fichas[actual];
-                fichas[actual] = fichas[siguiente];
-                fichas[siguiente] = temporal;
+            *************************************************************************/
+            if (f[actual].numFicha > f[sig].numFicha) {
+                // INTERCAMBIAMOS POSICIONES:
+                Ficha temp = f[actual];
+                f[actual] = f[sig];
+                f[sig] = temp;
             }
         }
     }
 }
 
-void systemPause() {
-    printf ("Press any key to continue...");
-    int c = getchar();
-    getchar();
+// Función para Eliminar Elementos de un Vector:
+void delElement (Ficha f[], int pos) {
+    for (int i = pos; i < totalFichas; i++) {
+        f[i] = f[i + 1];
+    }
+    totalFichas--;
+    // printf ("totalFichas = \t%i\n", totalFichas);
+}
+
+// Función para Verficiar que no Existan Dobles:
+int verificarDobles () {
+    for (int i = 0; i < canJug; i++) {
+        int dobles = 0;
+        for (int j = 0; j < canFichasJug; j++) {
+            if (jugadores[i].mazo[j].valores[0] == jugadores[i].mazo[j].valores[1]) {
+                dobles++;
+            }
+        }
+        if (dobles >= 4) { return TRUE; }
+    }
+    return FALSE;
+}
+
+/* FUNCIONES PARA PROBAR EL PROGRAMA */
+void imprimir() {
+    // Mostramos los datos del Jugador correpondiente:
+    for (int i = 0; i < canJug; i++) {
+        printf ("Datos del Jugador %d:\n", i+1);
+        printf ("Nombre:\t%s\n", jugadores[i].nom);
+        printf ("Fichas:\n");
+        for (int j = 0; j < canFichasJug; j++) {
+            printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
+        }
+        printf ("\n\n");
+    }
 }
