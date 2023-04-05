@@ -12,7 +12,6 @@ Nodo* CreandoNodo(Ficha *domino){
 	nuevo->dato = domino;
 	return nuevo;
 }
-
 /**guarda cual es el lado de la ficha que esta disponible para la siguiente ronda**/
 void determinando_salida(Nodo *actual, Nodo *nuevo){
 	int salida = actual->dato->salida;
@@ -98,11 +97,8 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
 void muestra_Recursivo(Nodo *actual){
    if(actual != NULL){
       printf("[ %d | %d ]\n",actual->dato->valores[0],actual->dato->valores[1]);
-      printf("\nsiguiente\n");
       muestra_Recursivo(actual->siguiente);
-      printf("\narriba\n");
       muestra_Recursivo(actual->arriba);
-      printf("\nabajo\n");
       muestra_Recursivo(actual->abajo);
    }
 }
@@ -111,8 +107,6 @@ void Mostrar_Nodos(Mesa *m){
    if(m != NULL){
 		muestra_Recursivo(m->raiz->anterior);
     	muestra_Recursivo(m->raiz);
-   }else{
-      printf("Mesa vacia\n");
    }
 }
 #endif
