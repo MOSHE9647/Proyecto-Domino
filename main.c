@@ -71,7 +71,7 @@ void repartirFichas ();                     /* Función que Reparte Fichas a cad
 void crearJugadores ();                     /* Función para Crear a cada Jugador               */
 int verificarDobles ();                     /* Verifica si Existen más de 4 Dobles por Jugador */
 
-/* METODOS DEL ARBOL  Linea 241 - 456*/
+/* METODOS DEL ARBOL  Linea 241 - 370 456 */
 void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion);
     /*Estos metodos son los utilizados por AgregarNodoArbol por lo que son internos a este mismo */  
     Nodo* CreandoNodo(Ficha *domino);
@@ -82,13 +82,13 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion);
 void muestra_Recursivo(Nodo *actual);
 void Mostrar_Nodos(Mesa *mesa);
 
-/* METODOS LISTAS */
-Lista *Fichas_Libres(Lista* lista, Mesa *mesa);
+/* METODOS LISTAS     Linea 370 - 456 */
+Lista *Fichas_Libres(Mesa *mesa);
     /*Estos metodos son funciones usadas internamente por el metodo Fichas_Libres */
     void ingresar_Lista(Lista *lista, Nodo* nodo);
-    void Buscando_fichas_disponibles(Lista *lista, Nodo *actual);
+    void Buscando_fichas_disponibles(Lista *lista, Nodo *actual);/* Metodo recursivo */
 
-void Liberar_Lista(Lista *lista);
+void Liberar_Lista(Lista *lista);/* Liberacion del Nodo *nodo->sig_auxiliar*/
 void Mostrar_Lista(Lista *l);
 
 /* FUNCION DE PRUEBA */
@@ -99,7 +99,7 @@ int main () {
 
     repartirFichas ();
     imprimir ();
-
+    
     // for (int i = 0; i < DOMINO; i++) {
     //     printf ("#%i:\t[%i|%i]\n", i + 1, listaMazoTotal[i].valores[0], listaMazoTotal[i].valores[1]);
     // }
@@ -410,8 +410,8 @@ void Buscando_fichas_disponibles(Lista *lista, Nodo *actual){/**Metodo recursivo
 	}
 }
 
-Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
-	//Lista* lista = NULL;
+Lista *Fichas_Libres(Mesa *mesa){
+	  Lista* lista = NULL;
 	  if(mesa->raiz != NULL){
       	lista = (Lista*)calloc(sizeof(Lista),1);
 		/**---REVISA QUE LA PRIMERA FICHA (RAIZ) ESTE LIBRE-----**/
