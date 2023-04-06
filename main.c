@@ -63,13 +63,13 @@ int canMazoJug = 0;                     /* Cantidad de Fichas para cada Jugador 
 int canJug = 0;                         /* Cantidad de Jugadores por partida        */
 
 /* LISTA DE FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
-void revolverFichas (Ficha f[], int size);
-void ordenarFichas (Ficha f[], int size);
-void delElement (Ficha f[], int pos);
-void inicializarFichas ();
-void repartirFichas ();
-void crearJugadores ();
-int verificarDobles ();
+void revolverFichas (Ficha f[], int size);  /* Función para Revolver una Lista de Fichas       */
+void ordenarFichas (Ficha f[], int size);   /* Función para Ordenar una Lista de Fichas        */
+void delElement (Ficha f[], int pos);       /* Función para Borrar Elementos de una Lista      */
+void inicializarFichas ();                  /* Inicializa las Variables de 'listaMazoTotal'    */
+void repartirFichas ();                     /* Función que Reparte Fichas a cada Jugador       */
+void crearJugadores ();                     /* Función para Crear a cada Jugador               */
+int verificarDobles ();                     /* Verifica si Existen más de 4 Dobles por Jugador */
 
 /* METODOS DEL ARBOL  Linea 241 - 456*/
 void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion);
