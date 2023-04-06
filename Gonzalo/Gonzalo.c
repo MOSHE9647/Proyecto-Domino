@@ -2,7 +2,7 @@
     Archivo de Trabajo de Gonzalo. Compilar su archivo con el siguiente comando: 
     gcc -o Gonzalo Gonzalo.c --> Esto para tener un orden al momento de crear los ejecutables
     ./Gonzalo --> Comando para ejecutar el programa
-
+    
     git status
     git add nombre_archivo
     git commit -m "Cualquier mensaje"
@@ -16,6 +16,7 @@
 #include "Metodos_Lista.h"
 
 int main(){
+    
     Nodo *n1 = (Nodo *)calloc(sizeof(Nodo),1);
     n1->dato = (Ficha *)calloc(sizeof(Ficha),1);
     n1->dato->valores[0] = 0;
@@ -46,6 +47,7 @@ int main(){
     ingresar_Lista(l,n2);
     ingresar_Lista(l,n3);
     ingresar_Lista(l,n4);
+
     Mostrar_Lista(l);
     Liberar_Lista(l);
 

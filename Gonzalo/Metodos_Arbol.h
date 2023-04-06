@@ -12,7 +12,7 @@ Nodo* CreandoNodo(Ficha *domino){
 	nuevo->dato = domino;
 	return nuevo;
 }
-/**guarda cual es el lado de la ficha que esta disponible para la siguiente ronda**/
+
 void determinando_salida(Nodo *actual, Nodo *nuevo){
 	int salida = actual->dato->salida;
 	if(actual->dato->valores[salida] == nuevo->dato->valores[0]){
@@ -72,11 +72,7 @@ void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccio
 		asignacion_recursivo(actual->siguiente, nuevo, destino, direccion);
 	}
 }
-/**
- * metodo prinsipal que se llamara fuera de este archivo
- * la direccion es = 2 en caso de que la ficha destion osea la ficha en la mesa
- * a la cual colocara la nueva es no par
- **/
+
 void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
 	Nodo *nuevo = CreandoNodo(domino);// crea el nodo apartir del la ficha recibida
  	if(mesa->raiz == NULL){
@@ -84,6 +80,7 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
 		mesa->raiz->dato->salida = 0;
 	}else if(mesa->raiz == destino)
 		Guardando_Nodo(mesa->raiz, nuevo, direccion);
+		/*sdasdasd*/
 	else{
       	asignacion_recursivo(mesa->raiz->anterior, nuevo, destino, direccion);
 		asignacion_recursivo(mesa->raiz, nuevo, destino, direccion);
