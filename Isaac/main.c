@@ -62,23 +62,34 @@ int canFichasJug = 0;                   /* Cantidad de Fichas que hay por Jugado
 int canMazoJug = 0;                     /* Cantidad de Fichas para cada Jugador     */
 int canJug = 0;                         /* Cantidad de Jugadores por partida        */
 
+/* FUNCIONES FALTANTES */
+//void ponerFicha();
+//void buscarDondeColocarFicha();
+void aciertaPuntos();
+void finJuego();
+
 /* VARIABLES Y FUNCIONES PARA HILOS */
 // Variables:
 pthread_t players [MAX_PLAYERS];        /* Vector de Hilos para Jugadores           */
 sem_t turnoJug;                         /* Semáforo para el Turno de cada Jugador   */
 
 // Funciones:
-void *ponerFicha (void *arg);           /* Plantilla para cuando esté listo el juego */
+//void *ponerFicha (void *arg);           /* Plantilla para cuando esté listo el juego */
 
 /* LISTA DE FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
 // Funciones relacionadas a Ficha [Lineas 107 - 224]:
 void revolverFichas (Ficha f[], int size);  /* Función para Revolver una Lista de Fichas       */
 void ordenarFichas (Ficha f[], int size);   /* Función para Ordenar una Lista de Fichas        */
 void delElement (Ficha f[], int pos);       /* Función para Borrar Elementos de una Lista      */
+void comerFichas(Jugador *j);
 void inicializarFichas ();                  /* Inicializa las Variables de 'listaMazoTotal'    */
 void repartirFichas ();                     /* Función que Reparte Fichas a cada Jugador       */
 void crearJugadores ();                     /* Función para Crear a cada Jugador               */
 int verificarDobles ();                     /* Verifica si Existen más de 4 Dobles por Jugador */
+
+// Funciones para E/S de Archivos:
+int escribir();
+int leer();
 
 // Funciones para el Árbol [Lineas 241 - 370]:
 void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion);
@@ -207,6 +218,18 @@ void ordenarFichas (Ficha f[], int size) {
                 f[sig] = temp;
             }
         }
+    }
+}
+
+// Función para Comer Fichas:
+void comerFichas (Jugador *j) {
+    if (canFichasJug < MAX_TILES) {
+        revolverFichas(listaFichasParaComer, totalFichas);
+        j->mazo[canFichasJug + 1] = listaFichasParaComer[0];
+        ordenarFichas(listaFichasParaComer, totalFichas);
+        canFichasJug++;
+
+        delElement (listaFichasParaComer, 0);
     }
 }
 
