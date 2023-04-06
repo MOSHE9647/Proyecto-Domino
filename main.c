@@ -83,7 +83,7 @@ void muestra_Recursivo(Nodo *actual);
 void Mostrar_Nodos(Mesa *mesa);
 
 /* METODOS LISTAS     Linea 370 - 456 */
-Lista *Fichas_Libres(Lista* lista, Mesa *mesa);
+Lista *Fichas_Libres(Mesa *mesa);
     /*Estos metodos son funciones usadas internamente por el metodo Fichas_Libres */
     void ingresar_Lista(Lista *lista, Nodo* nodo);
     void Buscando_fichas_disponibles(Lista *lista, Nodo *actual);/* Metodo recursivo */
@@ -410,8 +410,8 @@ void Buscando_fichas_disponibles(Lista *lista, Nodo *actual){/**Metodo recursivo
 	}
 }
 
-Lista *Fichas_Libres(Lista* lista, Mesa *mesa){
-	//Lista* lista = NULL;
+Lista *Fichas_Libres(Mesa *mesa){
+	  Lista* lista = NULL;
 	  if(mesa->raiz != NULL){
       	lista = (Lista*)calloc(sizeof(Lista),1);
 		/**---REVISA QUE LA PRIMERA FICHA (RAIZ) ESTE LIBRE-----**/
