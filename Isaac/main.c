@@ -55,7 +55,7 @@ Ficha *crearFicha (int a, int b);           /* Funcion que crea las fichas al in
 Jugador *crearJugador (Jugador *j);         /* Funcion que crea a los Jugadores                 */
 void imprimir(Jugador *j, int i);           /* Funcion para mostrar la información del Jugador  */
 void escribir(Jugador *j);                  /* Funcion para escribir en un archivo txt          */
-void leer ();                     /* Funcion para leer de un archivo txt              */
+void leer ();                               /* Funcion para leer de un archivo txt              */
 void revolver(Ficha *fichas, int size);     /* Funcion que revuelve todas las fichas            */
 void ordenar(Ficha *fichas, int longitud);  /* Funcion para ordenar las fichas del juego y maso */
 void systemPause();                         /* Funcion para pausar la pantalla                  */
