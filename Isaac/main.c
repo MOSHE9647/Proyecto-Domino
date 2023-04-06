@@ -1,266 +1,464 @@
-/*
-    Archivo de Trabajo del Proyecto. Aquí vamos a unir todo lo que hayamos hecho del proyecto
-    Compilar este archivo con el siguiente comando: 
-    gcc main.c --> Esto para tener un orden al momento de crear los ejecutables
-    ./main     --> Comando para ejecutar el programa
-*/
+#include <semaphore.h>      /* Para uso de Semáforos en el Juego */
+#include <pthread.h>        /* Para el uso de Hilos en el Juego  */
+#include <string.h>         /* Para uso de la función 'strcpy'   */
+#include <stdlib.h>         /* Para uso de Memoria Dinámica      */
+#include <unistd.h>         /* Para funciones propias de Linux   */
+#include <stdio.h>          /* Entrada y Salida Estándar de C    */
+#include <time.h>           /* Para uso de Números Aleatorios    */
 
-#include <stdio.h>        /* Entrada y Salida Estándar */
-#include <string.h>       /* Para usar 'strncpy'       */
-#include <stdlib.h>       /* Librería Estándar         */
-#include <stdbool.h>      /* Para el uso de Booleanos  */
-#include <unistd.h>
-#include <time.h>         /* Para números aleatorios   */
+#define ARCHIVO "log.txt"   /* Ubicación del Registro del Programa    */
+#define CHAR_LIMIT 1024     /* Límite de carácteres para nombres      */
+#define MAX_PLAYERS 7       /* Número Máximo de Jugadores por partida */
+#define MAX_COMER 10        /* Tamaño máximo de las Fichas para Comer */
+#define MAX_TILES 9         /* Cantidad máxima de Fichas por Jugador  */
+#define DOMINO 28           /* Cantidad de Fichas que posee el Juego  */
+#define FALSE 0             /* Creamos el tipo Booleano False = 0     */
+#define TRUE 1              /* Creamos el tipo Booleano True = 1      */ 
 
-#define ARCHIVO_TXT "log.txt"    /* Definición de la ruta de acceso al archivo 'log.txt'        */
-#define CHAR_LIMIT 1024          /* Límite de Carácteres para los Nombres y Lectura de Archivos */
-#define MAX_PLAYERS 7            /* Cantidad Maxima de Jugadores que admite el Juego            */
-#define DOMINO 28                /* Cantidad máxima de fichas que posee el juego                */
-
-/* 
-    Si les marca error con las variables o funciones de tipo 'bool',
-    eliminen la librería '<stdbool.h>' y descomenten los siguientes #define,
-    luego cambien el tipo 'bool' de las funciones por el tipo 'int'
-*/
-
-// #define true 1         
-// #define false 0
-
-// Estructura para las Fichas:
+/* ESTRUCTURA DE FICHA */
 typedef struct {
-    int valores[2]; /* Cada número que posee la ficha [a|b] */
-    int numFicha    /* Variable para conocer la posicion y reordenar las fichas */
+    int valores[2];         /* Valores que tiene la Ficha ( [Izq|Der] )     */
+    int salida;             /* Variable para obtener la 'punta' de la Ficha */
+    int numFicha;           /* Variable para el ordenamiento de las fichas  */
 } Ficha;
 
-// Estructura para crear a los jugadores:
+/* ESTRUCTURA DE JUGADOR */
 typedef struct {
-    /* 
-        Estas variables hay que cambiarlas por 
-        las variables que pide el Proyecto    
-    */
-    char nombre[CHAR_LIMIT];    
-    int edad;
-    int ID;
+    char nom[CHAR_LIMIT];   /* Variable que guarda el Nombre del Jugador           */
+    Ficha mazo[MAX_TILES];  /* Vector del Mazo para las Fichas del Jugador         */
+    int totalGanados;       /* Cantidad de Juegos Ganados que lleva cada Jugador   */
+    int totalPuntos;        /* Cantidad total de puntos que posee cada Jugador     */
+    int puntos;             /* Cantidad de puntos que lleva el Jugador por partida */
 } Jugador;
 
-// Variables Globales:
-Jugador jugadores[MAX_PLAYERS]; /* Vector de Jugadores                                          */
-Ficha *fichas = NULL;           /* Vector Dinámico de Fichas                                    */
-int posFicha = 1;               /* Variable para reordenar las fichas con el método de Burbuja  */
-int canJug = 0;                 /* Variable para almacenar la cantidad de jugadores por partida */
+/* ESTRUCTURA DE NODO */
+typedef struct {
+	Ficha *dato;            /* Guarda una referencia a una ficha                                              */
+	Nodo *anterior;         /* Guarda referencia del Nodo,"Ficha", que estaba libre anterios                  */
+    Nodo *arriba;           /* Guarda referencia del Nodo, colocado arriba, solo se usa en caso de ser doble  */
+    Nodo *abajo;            /* Guarda referencia del Nodo, colocado abajo, solo se usa en caso de ser doble   */
+    Nodo *siguiente;        /* Guarda referencia del Nodo, hacia delante                                      */
+    Nodo *sig_auxiliar;     /* Esto guarda solo una referencia temporal, solo para la lista de salidas        */
+	int cruzado;            /* Nos dice si esta colocada vertical o no                                        */	
+} Nodo;
 
-// Declaración de las funciones a utilizar dentro del Código:
-void iniciarJuego();                        /* Funcion donde se solicitan los datos iniciales   */
-Ficha *crearFicha (int a, int b);           /* Funcion que crea las fichas al iniciar el juego  */
-Jugador *crearJugador (Jugador *j);         /* Funcion que crea a los Jugadores                 */
-void imprimir(Jugador *j, int i);           /* Funcion para mostrar la información del Jugador  */
-void escribir(Jugador *j);                  /* Funcion para escribir en un archivo txt          */
-void leer ();                               /* Funcion para leer de un archivo txt              */
-void revolver(Ficha *fichas, int size);     /* Funcion que revuelve todas las fichas            */
-void ordenar(Ficha *fichas, int longitud);  /* Funcion para ordenar las fichas del juego y maso */
-void systemPause();                         /* Funcion para pausar la pantalla                  */
+/* ESTRUCTURA DE LISTA */
+typedef struct {
+	Nodo *primero;          /* Guarda referencia el primer Nodo agregado a lista                            */
+    Nodo *ultimo;           /* Guarda referencia al ultimo Nodo agregaddo a la lista                        */
+} Lista;
 
-/* Inico: Funcion Principal del Programa */
+/* ESTRUCTURA DE MESA */
+typedef struct {
+	Nodo *raiz;             /* Mantiene la referencia de la ficha inicia osea la primera colocada           */
+} Mesa;
+
+/* VARIABLES GLOBALES */
+Ficha listaFichasParaComer[MAX_COMER];  /* Lista de las Fichas para Comer           */
+Jugador jugadores[MAX_PLAYERS];         /* Lista de Jugadores por partida           */
+Ficha listaMazoTotal[DOMINO];           /* Lista de todas las Fichas del Juego      */
+int totalFichas = DOMINO;               /* Para Manejo de Vectores en el Juego      */
+int canFichasJug = 0;                   /* Cantidad de Fichas que hay por Jugador   */
+int canMazoJug = 0;                     /* Cantidad de Fichas para cada Jugador     */
+int canJug = 0;                         /* Cantidad de Jugadores por partida        */
+
+/* VARIABLES Y FUNCIONES PARA HILOS */
+// Variables:
+pthread_t players [MAX_PLAYERS];        /* Vector de Hilos para Jugadores           */
+sem_t turnoJug;                         /* Semáforo para el Turno de cada Jugador   */
+
+// Funciones:
+void *ponerFicha (void *arg);           /* Plantilla para cuando esté listo el juego */
+
+/* LISTA DE FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
+// Funciones relacionadas a Ficha [Lineas 107 - 224]:
+void revolverFichas (Ficha f[], int size);  /* Función para Revolver una Lista de Fichas       */
+void ordenarFichas (Ficha f[], int size);   /* Función para Ordenar una Lista de Fichas        */
+void delElement (Ficha f[], int pos);       /* Función para Borrar Elementos de una Lista      */
+void inicializarFichas ();                  /* Inicializa las Variables de 'listaMazoTotal'    */
+void repartirFichas ();                     /* Función que Reparte Fichas a cada Jugador       */
+void crearJugadores ();                     /* Función para Crear a cada Jugador               */
+int verificarDobles ();                     /* Verifica si Existen más de 4 Dobles por Jugador */
+
+// Funciones para el Árbol [Lineas 241 - 370]:
+void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion);
+    /* Métodos Utilizados Internamente por 'AgregarNodoArbol' */
+    Nodo* CreandoNodo(Ficha *domino);
+    void determinando_salida(Nodo *actual, Nodo *nuevo);
+    void Guardando_Nodo(Nodo *actual, Nodo* nuevo, int direccion);
+    void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccion);
+
+// Funciones para las Listas [Lineas 370 - 456]:
+Lista *Fichas_Libres(Mesa *mesa);
+    /* Métodos Utilizados Internamente por 'Fichas_Libres' */
+    void ingresar_Lista(Lista *lista, Nodo* nodo);
+    void Buscando_fichas_disponibles(Lista *lista, Nodo *actual);/* Metodo recursivo */
+
+void Liberar_Lista(Lista *lista);    /* Liberacion del Nodo '*nodo->sig_auxiliar' */
+void Mostrar_Lista(Lista *l);        /* Metodo para Mostrar una Lista Específica  */
+
+// Funciones para Prueba del Juego:
+void muestra_Recursivo(Nodo *actual);
+void Mostrar_Nodos(Mesa *mesa);
+void imprimir();
+
+/* FUNCIÓN MAIN */
 int main () {
-    int opc;
-	do {
-        opc = 0;
-		printf ("\n\t╔════════╣ JUEGO DOMINO ╠════════╗\n");
-		printf ("\t║                                ║\n");
-		printf ("\t║         1. Juego Nuevo         ║\n");
-		printf ("\t║         2. Puntuaciones        ║\n");
-		printf ("\t║         3. Salir               ║\n");
-		printf ("\t║                                ║\n");
-		printf ("\t╚════════════════════════════════╝\n");
-		printf ("\t       Digite una Opcion: ");
-		scanf ("%d", &opc);
 
-		switch (opc) {
-			case 1:
-				iniciarJuego();
-                break;
-            case 2:
-                leer();
-                systemPause();
-                break;
-            case 3:
-                return 0;
-                break;
-            default:
-                system("clear");
-                printf ("\tOpcion Invalida...\n");
-                printf ("\tDigite una Opción Válida.\n\n");
-                break;
-		}
-        system("clear");
-	} while (opc != 3);
-
+    repartirFichas ();
+    imprimir ();
+    
+    // for (int i = 0; i < DOMINO; i++) {
+    //     printf ("#%i:\t[%i|%i]\n", i + 1, listaMazoTotal[i].valores[0], listaMazoTotal[i].valores[1]);
+    // }
     return 0;
 }
-/* Fin: Funcion Principal del Programa */
 
-/* Aquí creamos las Funciones que vamos a utilizar dentro del Código */
-// Creamos las Fichas:
-Ficha *crearFicha (int a, int b) {
-    Ficha *nueva = calloc(sizeof(Ficha), 1); /* Variable auxiliar para crear las fichas */
-    nueva->valores[0] = a;                   /* Asignamos 'a'                           */
-    nueva->valores[1] = b;                   /* Asignamos 'b'                           */
-    nueva->numFicha = posFicha;              /* Le damos un Número a la Ficha           */
-    posFicha++;                              /* Aumentamos ese numero                   */
-    return nueva;                            /* Retornamos la Nueva Ficha               */
-}
+/* DESARROLLO DE FUNCIONES */
+// Función para Repartir Fichas:
+void repartirFichas () {
+    /* PEDIMOS CANTIDAD DE JUGADORES Y LOS CREAMOS */
+    // ** CTRL + Click para ir a la función ** //
+    crearJugadores ();
+    
+    /* DIVIDIMOS LA CANTIDAD DE FICHAS */
+    canFichasJug = DOMINO / (canJug + 1);           /* Cantidad de Fichas a Repartir */
 
-// Creamos a los Jugadores:
-Jugador *crearJugador(Jugador *j) {
-    /* 
-        Estas variables hay que cambiarlas por 
-        las variables que pide el Proyecto:
-    */
-    char nom[CHAR_LIMIT];
-    int edad = 0, ID = 0;
-
-    // Solicitamos los Datos al Usuario y Asignamos las Variables:
-    printf ("Digite su Nombre: ");
-    scanf ("%s", j->nombre);
-    printf ("Digite su Edad: ");
-    scanf ("%d", &j->edad);
-    printf ("Digite su ID: ");
-    scanf ("%d", &j->ID);    
-}
-
-void iniciarJuego() {
-    // Creamos las Fichas para el Juego:
-    Ficha *temp;        /* Variable temporal para crear las fichas del Juego */
-    int contador = 0;   /* Contador para la cantidad de Fichas creadas       */
-
-    for (int i = 0; i <= 6; i++) {
-        for (int j = 0; j <= 6; j++) {
-            if (j >= i) {
-                /* Le asignamos la memoria al Vector Dinámico: */
-                fichas = realloc(fichas, (contador + 1) * sizeof(Ficha));
-                temp = crearFicha(i, j);                        /* Creamos la ficha        */
-                memcpy(&fichas[contador], temp, sizeof(Ficha)); /* La ponemos en el Vector */
-                free(temp);                                     /* Liberamos la memoria    */
-                contador++;                                     /* Aumentamos el contador  */
+    /* REVOLVEMOS LAS FICHAS Y LAS REPARTIMOS */
+    do {
+        totalFichas = DOMINO;
+        inicializarFichas ();
+        revolverFichas (listaMazoTotal, DOMINO);
+        for (int i = 0; i < canJug; i++) {
+            for (int j = 0; j < canFichasJug; j++) {
+                jugadores[i].mazo[j] = listaMazoTotal[0];
+                delElement(listaMazoTotal, 0);
             }
+            ordenarFichas (jugadores[i].mazo, canFichasJug);
+        }
+    } while (verificarDobles () == TRUE);
+    /* ASIGNAMOS EL RESTO DE FICHAS A LA LISTA 'listaFichasParaComer' */
+    for (int i = 0; i < totalFichas; i++) { listaFichasParaComer[i] = listaMazoTotal[i]; }
+    ordenarFichas (listaFichasParaComer, totalFichas);
+}
+
+// Función para Inicializar las Fichas:
+void inicializarFichas () {
+    int numFicha = 0;
+    for (int i = 0; i <= 6; i++) {
+        for (int j = i; j <= 6 ; j++) {
+            listaMazoTotal[numFicha].numFicha = numFicha + 1;
+            listaMazoTotal[numFicha].valores[0] = i;
+            listaMazoTotal[numFicha].valores[1] = j;
+            listaMazoTotal[numFicha].salida = 0;
+            numFicha ++;
         }
     }
+}
 
-    // Solicitamos la Cantidad de Jugadores:
-    printf ("Digite el Número de Jugadores: ");
-    scanf ("%d", &canJug);
+// Función para Crear a los Jugadores:
+void crearJugadores () {
+    //AQUÍ HAY QUE VERIFICAR 'log.txt'
+    
+    /* SOLICITAMOS LA CANTIDAD DE JUGADORES */
+    printf ("Digite la Cantidad de Jugadores\n-> ");
+    scanf ("%i", &canJug);
 
-    // Solicitamos los Datos y creamos a los Jugadores:
+    /* CREAMOS A LOS JUGADORES */
     for (int i = 0; i < canJug; i++) {
-        system ("clear"); /* Limpia Pantalla */
-        printf ("Datos del Jugador %d:\n\n", i+1);
-        crearJugador(&jugadores[i]);
+        system ("clear");           /* Limpiamos la Pantalla del Terminal  */
+
+        /* SOLICITAMOS EL NOMBRE DE CADA JUGADOR */
+        printf ("Digite el nombre del Jugador %i\n-> ", i + 1);
+        scanf ("%s", jugadores[i].nom);
     }
 }
 
-void imprimir(Jugador *j, int i) {
-    /* Esta información también hay que cambiarla */
-    // Mostramos los datos del Jugador correpondiente:
-    printf ("Datos del Jugador %d:\n", i+1);
-    printf ("Nombre:\t%s\n", j->nombre);
-    printf ("Edad:\t%d\n", j->edad);
-    printf ("ID:\t%d\n\n", j->ID);
-}
-
-void escribir (Jugador *j) {
-    FILE* archivo;      /* Variable que apunta al Archivo que vamos a utilizar */
-    /* 
-        Las siguientes variables hay que cambiarlas por 
-        las variables que pide el Proyecto:
-    */
-	char Edad[CHAR_LIMIT];  /* Variable para almacenar la edad en formato string   */
-	char ID[CHAR_LIMIT];    /* Variable para almacenar la ID en formato string     */
-
-	archivo = fopen(ARCHIVO_TXT, "a"); /* Abrimos el archivo en modo escritura sin sobreescribir */
-
-    // Verificamos que se haya leído el archivo:
-	if (archivo == NULL) {
-		printf("Error al abrir el archivo.");
-        return;                       /* No se leyó correctamente */
-	} else {
-		sprintf (Edad, "%d", j[0].edad);    /* Convertimos edad de 'int' a 'string' */
-		sprintf (ID, "%d", j[0].ID);        /* Convertimos ID de 'int' a 'string'   */
-        
-        /* Escribimos la información de las variables en el archivo */
-		fputs (j->nombre, archivo); fputs ("\n", archivo);
-		fputs (Edad, archivo);      fputs ("\n", archivo);
-		fputs (ID, archivo);        fputs ("\n", archivo);
-	}
-
-	fclose (archivo);                       /* Cerramos el archivo   */
-}
-
-/* No sé si esta función sea necesaria */
-void leer () {
-	FILE *archivo;                   /* Variable que apunta al Archivo que vamos a utilizar */
-	archivo = fopen(ARCHIVO_TXT, "r"); /* Abrimos el archivo en Modo Lectura */
-	
-    char nombre[CHAR_LIMIT];         /* Variable que almacena el nombre en formato string */
-	int edad;
-	int ID;
-
-    // Verificamos que se haya leído el archivo:
-	if (archivo == NULL) {
-		/* Mostramos un mensaje de Error: */
-        system ("clear");
-		printf("Error al abrir el archivo.\n");
-        printf("Revise el nombre del archivo e intentelo nuevamente.\n\n");
-		return;  /* No se leyó correctamente */
-	}
-    /* 
-        Leemos el archivo y almacenamos lo leído en sus
-        respectivas variables: 
-    */
-	while (!feof(archivo)) {
-        fscanf (archivo, "%s %d %d", nombre, &edad, &ID);
-    }
-
-    /* Descomenten esto para probar si funciona: */
-	//printf ("Nombre:\t%sEdad:\t%d\nID:\t%d", j->nombre, j->edad, j->ID);
-    printf ("Nombre:\t%s\nEdad:\t%d\nID:\t%d\n\n", nombre, edad, ID);
-	fclose(archivo);    /* Cerramos el archivo   */
-}
-
-void revolver (Ficha *fichas, int size) {
-    /*
+// Función para Revolver las Fichas:
+void revolverFichas (Ficha f[], int size) {
+    /*******************************************************
         Revolvemos las fichas intercambiandolas de lugar
         de forma aleatoria utilizando la funcion 'rand()'
-    */
-    srand(time(NULL));  /* Semilla para los números aleatorios */
+    ********************************************************/
+    srand(time(NULL)); // <- SEMILLA
     for (int i = 0; i < size; i++) {
-        /* Realizamos el Intercambio */
-        int j = rand() % size;  /* Variable con las posiciones a intercambiar  */
-        Ficha temp = fichas[i]; /* Variable auxiliar para realizar el cambio   */
-        fichas[i] = fichas[j];
-        fichas[j] = temp;
+        int aux = rand () % size;       /* Auxiliar para tener una posición aleatoria     */
+        Ficha temp = f[i];              /* Auxiliar Temporal para Realizar el Intercambio */
+        // INTERCAMBIAMOS POSICIONES:
+        f[i] = f[aux];
+        f[aux] = temp;
     }
 }
 
-void ordenar (Ficha *fichas, int longitud) {
-    /* Ordenamiento por Método de la Burbuja */
-    for (int i = 0; i < longitud; i++) {
-        for (int actual = 0; actual < longitud - 1; actual++) {
-            int siguiente = actual + 1;
-            /*
-                Si el actual es mayor que el que le sigue a la derecha intercambiamos, es decir,
+// Función para Ordenar las Fichas:
+void ordenarFichas (Ficha f[], int size) {
+    /* ORDENAMOS CON EL MÉTODO DE LA BURBUJA */
+    for (int i = 0; i < size; i++) {
+        for (int actual = 0; actual < size - 1; actual++) {
+            int sig = actual + 1;
+            /************************************************************************
+                Si el 'actual' es mayor que 'siguiente', intercambiamos. Es decir,
                 movemos el actual a la derecha y el de la derecha al actual:
-            */
-            if (fichas[actual].numFicha > fichas[siguiente].numFicha) {
-                Ficha temporal = fichas[actual];
-                fichas[actual] = fichas[siguiente];
-                fichas[siguiente] = temporal;
+            *************************************************************************/
+            if (f[actual].numFicha > f[sig].numFicha) {
+                // INTERCAMBIAMOS POSICIONES:
+                Ficha temp = f[actual];
+                f[actual] = f[sig];
+                f[sig] = temp;
             }
         }
     }
 }
 
-void systemPause() {
-    printf ("Press any key to continue...");
-    int c = getchar();
-    getchar();
+// Función para Eliminar Elementos de un Vector:
+void delElement (Ficha f[], int pos) {
+    for (int i = pos; i < totalFichas; i++) {
+        f[i] = f[i + 1];
+    }
+    totalFichas--;
+    // printf ("totalFichas = \t%i\n", totalFichas);
+}
+
+// Función para Verficiar que no Existan Dobles:
+int verificarDobles () {
+    for (int i = 0; i < canJug; i++) {
+        int dobles = 0;
+        for (int j = 0; j < canFichasJug; j++) {
+            if (jugadores[i].mazo[j].valores[0] == jugadores[i].mazo[j].valores[1]) {
+                dobles++;
+            }
+        }
+        if (dobles >= 4) { return TRUE; }
+    }
+    return FALSE;
+}
+
+/* AQUI ESTAN LOS METODOS DEL ARBOL Y LAS LISTA ENTRE OTROS 
+ * CODIGO DE GONZALO EL CRACK
+ */
+/*-----ESTOS METODOS SON PARA EL AGREGACION DE NODOS AL ARBOL------*/
+/*Crea nodos recibbiendo una ficha*/
+Nodo* CreandoNodo(Ficha *domino){
+	Nodo *nuevo = (Nodo *)calloc(sizeof(Nodo),1);
+	nuevo->dato = domino;
+	return nuevo;
+}
+/**
+ * Determina cual lado de la ficha queda lire para seguir colocando
+ * **/
+void determinando_salida(Nodo *actual, Nodo *nuevo){
+	int salida = actual->dato->salida;
+	if(actual->dato->valores[salida] == nuevo->dato->valores[0]){
+        nuevo->dato->salida = 1;
+	}else if(actual->dato->valores[salida] == nuevo->dato->valores[1]){
+		nuevo->dato->salida = 0;
+	}
+}
+/**
+ * Se encarga de guardar el nuevo nodo 
+ * en la direccion deseada
+ * asi mismo llamando el metodo determinar_salida
+ * asi mismo se encarga de que de saber si una ficha doble esta cruzada o similar al restro
+ * **/
+void Guardando_Nodo(Nodo *actual, Nodo* nuevo, int direccion){
+	if(actual != NULL){/*evitar posible error*/
+		if(actual->dato->valores[0] != actual->dato->valores[1]){
+			if(actual->siguiente == NULL){
+				determinando_salida(actual, nuevo);
+				nuevo->anterior = actual;
+				actual->siguiente = nuevo;
+			}
+		}else if(actual->dato->valores[0] == actual->dato->valores[1] && actual->cruzado == 0){
+			if(actual->arriba == NULL && direccion == 1){
+				determinando_salida(actual, nuevo);
+				nuevo->anterior = actual;
+				actual->arriba = nuevo;
+			
+			}else if(actual->siguiente == NULL && direccion == 2){
+				determinando_salida(actual, nuevo);
+				nuevo->anterior = actual;
+				actual->siguiente = nuevo;
+
+			}else if(actual->abajo == NULL && direccion == 3){
+				determinando_salida(actual, nuevo);
+				nuevo->anterior = actual;
+				actual->abajo = nuevo;
+
+			}else if(actual->anterior == NULL && direccion == 0){
+				determinando_salida(actual, nuevo);
+				nuevo->anterior = actual;
+				actual->anterior = nuevo;
+
+			}
+		}else{
+			determinando_salida(actual, nuevo);
+			nuevo->anterior = actual;
+			actual->siguiente = nuevo;
+		}
+	}
+}
+/**
+ * Metodo recursivo encargado de recorrer las fichas de mesa para asignar nueva ficha
+ * recive el nodo actua el cual es el nodo por el que se esta revisando
+ * el nodo destino el cual es el en donde se colocara la ficha
+ * y direccio explicado mas adelante
+ * **/
+void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccion){
+	if(actual != NULL){/* Corte de la recursividad */
+		if(actual == destino){
+            /*Guarda el nodo nuevo en caso de que actual sea el nodo buscado ose el mismo nodo destino*/
+			Guardando_Nodo(actual, nuevo, direccion);
+	    }else{
+            /*Llamando al mismo metodo asignacion_recursivo */
+            /*Condicional para realizar busqueda de todos los lados en caso de ficha par*/
+		    if(actual->dato->valores[0] == actual->dato->valores[1]){
+			    asignacion_recursivo(actual->arriba, nuevo, destino, direccion);
+			    asignacion_recursivo(actual->abajo, nuevo, destino, direccion);
+		    }
+		    asignacion_recursivo(actual->siguiente, nuevo, destino, direccion);
+        }
+	}
+}
+/* Este metodo es el que se encarga de la ejecucion del proceso guardar
+*  Mesa *mesa;      Es el arbol osea las fichas de la mesa
+*  Ficha *domio;    Ficha elegida por el jugador para ser colocada en la mesa
+*  Nodo *destino;   Ficha de la mesa a la cual se le colocar una ficha siguente
+*  int direccion;   Esto en caso de colocar ficha en una ficha destino doble 
+*                   1 arriba
+*                   2 siguiente
+*                   3 abajo
+*                   0 anterior   ""esto solo si es en nodo raiz, mejorara mas adelante
+*/
+void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
+	Nodo *nuevo = CreandoNodo(domino);/*crea el nodo apartir del la ficha recibida*/
+ 	if(mesa->raiz == NULL){/* Colocasion primera ficha*/
+		mesa->raiz = nuevo;
+		mesa->raiz->dato->salida = 0;
+	}else if(mesa->raiz == destino){/*cololoca en caso de que se desea colocar al rededos de la ficha raiz*/
+		Guardando_Nodo(mesa->raiz, nuevo, direccion);
+	}else{
+        /* llamando los metodos recursivos para recorrer el arbol */
+      	asignacion_recursivo(mesa->raiz->anterior, nuevo, destino, direccion);
+		asignacion_recursivo(mesa->raiz, nuevo, destino, direccion);
+	}
+}	
+
+/*----ESTOS METODOS SON DE LA LISTA DE NODOS DIPONIBLES DEL ARBOL*/
+/* Ingresa nodos fichas a la lista de una manera ordenada */
+void ingresar_Lista(Lista *lista, Nodo* nodo){
+	if(lista->primero == NULL){
+		lista->primero = nodo;
+		lista->ultimo = nodo; 
+	}else{
+		if(lista->primero->dato->valores[lista->primero->dato->salida] >= nodo->dato->valores[nodo->dato->salida]){
+			nodo->sig_auxiliar = lista->primero;
+			lista->primero = nodo;
+		}else if(lista->ultimo->dato->valores[lista->primero->dato->salida] <= nodo->dato->valores[nodo->dato->salida]){
+			lista->ultimo->sig_auxiliar = nodo;
+			lista->ultimo = nodo;
+		}else{
+			Nodo *actual = lista->primero;
+            int salida = nodo->dato->salida;
+			while (actual != NULL){
+                int auxiliar = actual->dato->salida;
+				if(nodo->dato->valores[salida] <= actual->sig_auxiliar->dato->valores[auxiliar]){
+                    nodo->sig_auxiliar = actual->sig_auxiliar;
+					actual->sig_auxiliar = nodo;
+                    actual = lista->ultimo;
+				}
+				actual = actual->sig_auxiliar;
+			}
+		}
+	}
+}
+
+void Buscando_fichas_disponibles(Lista *lista, Nodo *actual){/**Metodo recursivo**/
+    if(actual != NULL){
+		if(actual->dato->valores[0] == actual->dato->valores[1] && actual->cruzado == 0){
+			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL)
+				ingresar_Lista(lista, actual);
+		}else if(actual->siguiente == NULL){
+				ingresar_Lista(lista, actual);
+		}
+		Buscando_fichas_disponibles(lista, actual->siguiente);
+		Buscando_fichas_disponibles(lista, actual->arriba);
+		Buscando_fichas_disponibles(lista, actual->abajo);
+	}
+}
+
+Lista *Fichas_Libres(Mesa *mesa){
+	  Lista* lista = NULL;
+	  if(mesa->raiz != NULL){
+      	lista = (Lista*)calloc(sizeof(Lista),1);
+		/**---REVISA QUE LA PRIMERA FICHA (RAIZ) ESTE LIBRE-----**/
+		if(mesa->raiz->siguiente == NULL || mesa->raiz->anterior == NULL || mesa->raiz->arriba == NULL || mesa->raiz->abajo == NULL){
+			ingresar_Lista(lista,mesa->raiz);
+		}
+		Buscando_fichas_disponibles(lista, mesa->raiz->arriba);
+		Buscando_fichas_disponibles(lista, mesa->raiz->abajo);
+		Buscando_fichas_disponibles(lista, mesa->raiz->siguiente);
+		Buscando_fichas_disponibles(lista, mesa->raiz->anterior);
+	  }
+	  return lista;
+}
+
+void Liberar_Lista(Lista *lista){/**/
+	if(lista->primero != NULL){
+		while (lista->primero!=NULL){
+			Nodo *auxiliar = lista->primero;
+			lista->primero = lista->primero->sig_auxiliar;
+			auxiliar->sig_auxiliar = NULL;
+		}
+		lista->ultimo = NULL;
+	}
+}
+/* MUESTRA FICHAS */
+void Mostrar_Lista(Lista *l){
+    if(l->primero != NULL){
+        Nodo *actual = l->primero;
+        while (actual != NULL){
+            int salida = actual->dato->salida;
+            if(salida == 0){
+                printf("[ %d | %d ]\n",actual->dato->valores[0],actual->dato->valores[1]);
+            }else{
+                printf("[ %d | %d ]\n",actual->dato->valores[1],actual->dato->valores[0]);
+            }
+            actual = actual->sig_auxiliar;
+        }
+    }
+}
+/******************************************
+ *  FIN DE LOS METODOS DEL ARBOL Y LISTAS 
+ *  CODIGO DEL MAS ZAICO AQUI
+ *  "COMO ARROZ!!"
+*******************************************/
+
+/* FUNCIONES PARA PROBAR EL PROGRAMA */
+void imprimir() {
+    // Mostramos los datos del Jugador correpondiente:
+    for (int i = 0; i < canJug; i++) {
+        printf ("Datos del Jugador %d:\n", i+1);
+        printf ("Nombre:\t%s\n", jugadores[i].nom);
+        printf ("Fichas:\n");
+        for (int j = 0; j < canFichasJug; j++) {
+            printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
+        }
+        printf ("\n\n");
+    }
+}
+
+void muestra_Recursivo(Nodo *actual){
+   if(actual != NULL){
+      printf("[ %d | %d ]\n",actual->dato->valores[0],actual->dato->valores[1]);
+      muestra_Recursivo(actual->siguiente);
+      muestra_Recursivo(actual->arriba);
+      muestra_Recursivo(actual->abajo);
+   }
+}
+
+void Mostrar_Nodos(Mesa *mesa){
+   if(mesa != NULL){
+		muestra_Recursivo(mesa->raiz->anterior);
+    	muestra_Recursivo(mesa->raiz);
+   }
 }

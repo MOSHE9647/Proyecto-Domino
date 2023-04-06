@@ -17,6 +17,7 @@
 typedef struct Nodo Nodo;
 typedef struct Lista Lista;
 typedef struct Mesa Mesa;
+
 /* ESTRUCTURA DE FICHA */
 typedef struct {
     int valores[2];         /* Valores que tiene la Ficha ( [Izq|Der] )     */
