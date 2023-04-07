@@ -20,9 +20,14 @@ typedef struct {
     int numFicha;           /* Variable para el ordenamiento de las fichas  */
 } Ficha;
 
-Ficha listaMazoTotal[DOMINO];
-sem_t turno;
+typedef struct {
+    int id;
+    int j;
+} argumentos;
 
+Ficha listaMazoTotal[DOMINO];
+argumentos args;
+sem_t turno;
 void *jugar(void *arg);
 void inicializarFichas ();
 
@@ -32,10 +37,11 @@ int main() {
     inicializarFichas();
 
     pthread_t players[4];
-    int ids[] = {1, 2, 3, 4};
+    args.j = 3;
 
     for (int i = 0; i < 4; i++) {
-        pthread_create(&players[i], NULL, jugar, &ids[i]);
+        args.id = i;
+        pthread_create(&players[i], NULL, jugar, (void *)&args);
     }
 
     for (int i = 0; i < 4; i++) {
@@ -48,15 +54,17 @@ int main() {
 }
 
 void *jugar(void *arg) {
-    int ID = *(int *)arg;
     while (1) {
         sem_wait (&turno);
-        srand(time(NULL));
-        int j = rand() % DOMINO;
-        printf("Turno del Jugador %i:\n", ID);
-        printf("Jugador %d tomó una ficha de la canasta.\n", ID);
-        printf("Jugador %d colocó la ficha [%i|%i] en la mesa de juego.\n", ID, listaMazoTotal[j].valores[0], listaMazoTotal[j].valores[1]);
-        printf("Jugador %d terminó su turno.\n\n", ID);
+        printf("Turno del Jugador %i:\n", args.id);
+        printf("Jugador %d tomó una ficha de la canasta.\n", args.id);
+        if (args.j == 3) {
+            sem_post(&turno);
+            pthread_exit(NULL);
+        }
+        printf("Jugador %d colocó la ficha [%i|%i] en la mesa de juego.\n", args.id, listaMazoTotal[args.j].valores[0], listaMazoTotal[args.j].valores[1]);
+        printf("Jugador %d terminó su turno.\n\n", args.id);
+        args.j = 0;
         sem_post(&turno);
         pthread_exit(NULL);
     }

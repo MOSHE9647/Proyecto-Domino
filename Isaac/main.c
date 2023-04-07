@@ -24,15 +24,18 @@ typedef struct {
 
 /* ESTRUCTURA DE JUGADOR */
 typedef struct {
-    char nom[CHAR_LIMIT];   /* Variable que guarda el Nombre del Jugador           */
-    Ficha mazo[MAX_TILES];  /* Vector del Mazo para las Fichas del Jugador         */
-    int totalGanados;       /* Cantidad de Juegos Ganados que lleva cada Jugador   */
-    int totalPuntos;        /* Cantidad total de puntos que posee cada Jugador     */
-    int puntos;             /* Cantidad de puntos que lleva el Jugador por partida */
+    char nom[CHAR_LIMIT];   /* Variable que guarda el Nombre del Jugador            */
+    Ficha mazo[MAX_TILES];  /* Vector del Mazo para las Fichas del Jugador          */
+    int totalGanados;       /* Cantidad de Juegos Ganados que lleva cada Jugador    */
+    int totalPuntos;        /* Cantidad total de puntos que posee cada Jugador      */
+    int canMazoJug;         /* Cantidad de Fichas que posee cada Jugador en el Mazo */
+    int puntos;             /* Cantidad de puntos que lleva el Jugador por partida  */
+    
 } Jugador;
 
 /* ESTRUCTURA DE NODO */
-typedef struct {
+typedef struct Nodo Nodo;
+struct Nodo {
 	Ficha *dato;            /* Guarda una referencia a una ficha                                              */
 	Nodo *anterior;         /* Guarda referencia del Nodo,"Ficha", que estaba libre anterios                  */
     Nodo *arriba;           /* Guarda referencia del Nodo, colocado arriba, solo se usa en caso de ser doble  */
@@ -40,7 +43,7 @@ typedef struct {
     Nodo *siguiente;        /* Guarda referencia del Nodo, hacia delante                                      */
     Nodo *sig_auxiliar;     /* Esto guarda solo una referencia temporal, solo para la lista de salidas        */
 	int cruzado;            /* Nos dice si esta colocada vertical o no                                        */	
-} Nodo;
+};
 
 /* ESTRUCTURA DE LISTA */
 typedef struct {
@@ -59,8 +62,13 @@ Jugador jugadores[MAX_PLAYERS];         /* Lista de Jugadores por partida       
 Ficha listaMazoTotal[DOMINO];           /* Lista de todas las Fichas del Juego      */
 int totalFichas = DOMINO;               /* Para Manejo de Vectores en el Juego      */
 int canFichasJug = 0;                   /* Cantidad de Fichas que hay por Jugador   */
-int canMazoJug = 0;                     /* Cantidad de Fichas para cada Jugador     */
 int canJug = 0;                         /* Cantidad de Jugadores por partida        */
+
+/* FUNCIONES FALTANTES */
+//void ponerFicha();
+//void buscarDondeColocarFicha();
+void aciertaPuntos();
+void finJuego();
 
 /* VARIABLES Y FUNCIONES PARA HILOS */
 // Variables:
@@ -68,17 +76,22 @@ pthread_t players [MAX_PLAYERS];        /* Vector de Hilos para Jugadores       
 sem_t turnoJug;                         /* Semáforo para el Turno de cada Jugador   */
 
 // Funciones:
-void *ponerFicha (void *arg);           /* Plantilla para cuando esté listo el juego */
+//void *ponerFicha (void *arg);           /* Plantilla para cuando esté listo el juego */
 
 /* LISTA DE FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
 // Funciones relacionadas a Ficha [Lineas 107 - 224]:
 void revolverFichas (Ficha f[], int size);  /* Función para Revolver una Lista de Fichas       */
 void ordenarFichas (Ficha f[], int size);   /* Función para Ordenar una Lista de Fichas        */
 void delElement (Ficha f[], int pos);       /* Función para Borrar Elementos de una Lista      */
+void comerFichas(Jugador *j);
 void inicializarFichas ();                  /* Inicializa las Variables de 'listaMazoTotal'    */
 void repartirFichas ();                     /* Función que Reparte Fichas a cada Jugador       */
 void crearJugadores ();                     /* Función para Crear a cada Jugador               */
 int verificarDobles ();                     /* Verifica si Existen más de 4 Dobles por Jugador */
+
+// Funciones para E/S de Archivos:
+int escribir();
+int leerArchivo();
 
 // Funciones para el Árbol [Lineas 241 - 370]:
 void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion);
@@ -105,8 +118,19 @@ void imprimir();
 /* FUNCIÓN MAIN */
 int main () {
 
-    repartirFichas ();
-    imprimir ();
+    // repartirFichas ();
+
+    // Mesa *mesa = (Mesa*) calloc (sizeof(Mesa), 1);
+    // Lista *temp = Fichas_Libres(mesa);
+
+    // if (temp != NULL) {
+
+    // }
+
+    // imprimir ();
+
+    leerArchivo ();
+    
     
     // for (int i = 0; i < DOMINO; i++) {
     //     printf ("#%i:\t[%i|%i]\n", i + 1, listaMazoTotal[i].valores[0], listaMazoTotal[i].valores[1]);
@@ -207,6 +231,18 @@ void ordenarFichas (Ficha f[], int size) {
                 f[sig] = temp;
             }
         }
+    }
+}
+
+// Función para Comer Fichas:
+void comerFichas (Jugador *j) {
+    if (canFichasJug < MAX_TILES) {
+        revolverFichas(listaFichasParaComer, totalFichas);
+        j->mazo[canFichasJug + 1] = listaFichasParaComer[0];
+        ordenarFichas(listaFichasParaComer, totalFichas);
+        canFichasJug++;
+
+        delElement (listaFichasParaComer, 0);
     }
 }
 
@@ -461,4 +497,35 @@ void Mostrar_Nodos(Mesa *mesa){
 		muestra_Recursivo(mesa->raiz->anterior);
     	muestra_Recursivo(mesa->raiz);
    }
+}
+
+int leerArchivo() {
+    FILE *archivo;                   /* Variable que apunta al Archivo que vamos a utilizar */
+	archivo = fopen(ARCHIVO, "r");   /* Abrimos el archivo en Modo Lectura */
+	
+    char nombre[CHAR_LIMIT];         /* Variable que almacena el nombre en formato string */
+	int totalPuntos;
+    int puntos;
+
+    // Verificamos que se haya leído el archivo:
+	if (archivo == NULL) {
+		/* Mostramos un mensaje de Error: */
+        system ("clear");
+		printf("Error al abrir el archivo.\n");
+        printf("Revise el nombre del archivo e intentelo nuevamente.\n\n");
+		return FALSE;  /* No se leyó correctamente */
+	}
+    /* 
+        Leemos el archivo y almacenamos lo leído en sus
+        respectivas variables: 
+    */
+	while (!feof(archivo)) {
+        fscanf (archivo, "%s %d %d", nombre, &puntos, &totalPuntos);
+    }
+
+    /* Descomenten esto para probar si funciona: */
+	//printf ("Nombre:\t%sEdad:\t%d\nID:\t%d", j->nombre, j->edad, j->ID);
+    printf ("Nombre:\t%s\nPuntos:\t%d\nSumatoria Puntos:\t%d\n\n", nombre, puntos, totalPuntos);
+	fclose(archivo);    /* Cerramos el archivo   */
+    return TRUE;
 }
