@@ -4,15 +4,21 @@
  * aqui creo la lista con los nodos libres de la mesa
  * de una manera ordenada jejej
  **/
-void Sumando_Extremos_De_Mesa(int *contador, Nodo* nuevo){
+int Sumando_Extremos_De_Mesa(int contador, Nodo* nuevo){
     if(nuevo->cruzado == 0 && nuevo->dato->valores[0] == nuevo->dato->valores[1]){
-        if(nuevo->abajo == NULL)
+        if(nuevo->arriba == NULL){
+            printf("Puntos %d +  %d \n",contador,nuevo->dato->valores[nuevo->dato->salida]);
             contador += nuevo->dato->valores[nuevo->dato->salida];
-         if(nuevo->abajo == NULL)
-            contador += nuevo->dato->valores[nuevo->dato->salida];
+        }
+        if(nuevo->abajo == NULL){
+            printf("Puntos %d +  %d \n",contador,nuevo->dato->valores[nuevo->dato->salida]);
+            contador += nuevo->dato->valores[nuevo->dato->salida];   
+        }
     }else{
         contador += nuevo->dato->valores[nuevo->dato->salida];
+        printf("::Puntos %d +  %d \n",contador,nuevo->dato->valores[nuevo->dato->salida]);
     }
+    return contador;
 }
 
 void ingresar_Lista(Lista *lista, Nodo* nodo){
@@ -50,11 +56,11 @@ void Buscando_fichas_disponibles(Lista *lista, Nodo *actual){/**Metodo recursivo
     if(actual != NULL){
 		if(actual->dato->valores[0] == actual->dato->valores[1] && actual->cruzado == 0){
 			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL){
-                Sumando_Extremos_De_Mesa(&lista->contador, actual);
+                lista->contador = Sumando_Extremos_De_Mesa(&lista->contador, actual);
 				ingresar_Lista(lista, actual);
             }
 		}else if(actual->siguiente == NULL){
-                Sumando_Extremos_De_Mesa(&lista->contador, actual);
+                lista->contador = Sumando_Extremos_De_Mesa(lista->contador, actual);
 				ingresar_Lista(lista, actual);
 		}
 		Buscando_fichas_disponibles(lista, actual->siguiente);
@@ -93,6 +99,7 @@ void Liberar_Lista(Lista *lista){/**/
 void Mostrar_Lista(Lista *l){
     if(l->primero != NULL){
         Nodo *actual = l->primero;
+        printf("\n\nPuntos %d \n", l->contador);
         while (actual != NULL){
             int salida = actual->dato->salida;
             if(salida == 1){
@@ -108,45 +115,25 @@ void Mostrar_Lista(Lista *l){
 /* Mostrando Puntos junto con variables del jugador */
 void Mostrando_posibles_Puntajes(Nodo *actual, int valor_x, int valor_y, int puntos, int numNodo){
     int salida = actual->dato->salida;
-    if(salida == 1){
-        printf("#%d  [ %d | %d ] ->",numNodo,actual->dato->valores[0],actual->dato->valores[1]);
-    }else{
-        printf("%d   [ %d | %d ] ->",numNodo,actual->dato->valores[1],actual->dato->valores[0]);
-    }
+        if(salida == 1){
+            printf("#%d  [ %d | %d ] ->",numNodo,actual->dato->valores[0],actual->dato->valores[1]);
+        }else{
+            printf("%d   [ %d | %d ] ->",numNodo,actual->dato->valores[1],actual->dato->valores[0]);
+        }
     printf(" [ %d | %d ]           Suma: %d\n", valor_x, valor_y, puntos);
 }
 
-Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano , int *seleccion_f){
-    Nodo *destino = NULL;
-    Nodo *actual = lista->primero;
-    int puntos = 0, contador_nodo = 1;
-    int ficha = 0, mayor_Mult = 0, mayor_Genr = 0;
+Nodo* Comparando_Lista(Lista *lista, Ficha *mazo[], int tamano , int *seleccion_f){
+    Nodo *aux = NULL;/*Guarda ciertos nodos en caso de comparacion a mayor divisibles entre 5*/
+    Ficha *aux_f = NULL;
 
-    while (actual != NULL){
-        int salida = actual->dato->salida;
-        for(int i = 0; i < tamano; i++){
-            int valor_x = mazo[i].valores[0];
-            int valor_y = mazo[i].valores[1];
-            if((valor_x == valor_y) && (valor_x == actual->dato->valores[salida])){
-                    puntos = lista->contador;
-                    puntos = mazo[i].valores[0] + mazo[i].valores[1];
-                    Mostrando_posibles_Puntajes(actual, valor_x, valor_y, puntos, contador_nodo);
-            }else{
-                if(valor_x == actual->dato->valores[salida]){
-                    puntos = lista->contador;
-                    puntos = mazo[i].valores[0] - actual->dato->valores[salida];
-                    Mostrando_posibles_Puntajes(actual, valor_x, valor_y, puntos, contador_nodo);
-                }
-                if(valor_y == actual->dato->valores[salida]){
-                    puntos = lista->contador;
-                    puntos = mazo[i].valores[1] - actual->dato->valores[salida]; 
-                    Mostrando_posibles_Puntajes(actual, valor_y, valor_x, puntos, contador_nodo);
-                }
-            } 
-        }
-        contador_nodo++;
-        actual = actual->sig_auxiliar;
-    }
+    Nodo *aux_2 = NULL;/*En caso de que no hayase un que sume puntos divisibles entre 5*/
+    Ficha *aux_f_2 = NULL;
+    int mayor_Div = 0, mayor_No_Div = 0;
+
+
+
+    return NULL;
 }
 
 

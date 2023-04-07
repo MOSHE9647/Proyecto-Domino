@@ -16,6 +16,9 @@
 #include "Metodos_Lista.h"
 
 int main(){
+
+    Mesa *mesa = (Mesa *)calloc(sizeof(Mesa), 1);
+
     
     Nodo *n1 = (Nodo *)calloc(sizeof(Nodo),1);
     n1->dato = (Ficha *)calloc(sizeof(Ficha),1);
@@ -38,16 +41,24 @@ int main(){
     Nodo *n4 = (Nodo *)calloc(sizeof(Nodo),1);
     n4->dato = (Ficha *)calloc(sizeof(Ficha),1);
     n4->dato->valores[0] = 3;
-    n4->dato->valores[1] = 6;
+    n4->dato->valores[1] = 0;
     n4->dato->salida = 0;
 
+    Nodo *n5 = (Nodo *)calloc(sizeof(Nodo),1);
+    n5->dato = (Ficha *)calloc(sizeof(Ficha),1);
+    n5->dato->valores[0] = 6;
+    n5->dato->valores[1] = 3;
+    n5->dato->salida = 1;
+    
 
-    Lista *l = (Lista *)calloc(sizeof(Lista),1);
-    ingresar_Lista(l,n1);
-    ingresar_Lista(l,n2);
-    ingresar_Lista(l,n3);
-    ingresar_Lista(l,n4);
+    AgregarNodoArbol(mesa,n1,NULL,0);
+    AgregarNodoArbol(mesa,n2,n1,2);
+    AgregarNodoArbol(mesa,n3,n2,2);
+    AgregarNodoArbol(mesa,n4,n1,0);
+    AgregarNodoArbol(mesa,n5,n4,2);
+    Mostrar_Nodos(mesa);
 
+    Lista *l = Fichas_Libres(mesa);
     Mostrar_Lista(l);
     Liberar_Lista(l);
 

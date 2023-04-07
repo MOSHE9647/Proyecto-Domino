@@ -92,12 +92,13 @@ void asignacion_recursivo(Nodo *actual, Nodo* nuevo, Nodo *destino, int direccio
 *                   3 abajo
 *                   0 anterior   ""esto solo si es en nodo raiz, mejorara mas adelante
 */
-void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
-	Nodo *nuevo = CreandoNodo(domino);/*crea el nodo apartir del la ficha recibida*/
+void AgregarNodoArbol(Mesa* mesa,Nodo *nuevo/**Ficha* domino**/, Nodo *destino, int direccion){
+	//Nodo *nuevo = CreandoNodo(domino);/*crea el nodo apartir del la ficha recibida*/
  	if(mesa->raiz == NULL){/* Colocasion primera ficha*/
 		mesa->raiz = nuevo;
 		mesa->raiz->dato->salida = 0;
 	}else if(mesa->raiz == destino){/*cololoca en caso de que se desea colocar al rededos de la ficha raiz*/
+		printf("Igual a la raiz\n");
 		Guardando_Nodo(mesa->raiz, nuevo, direccion);
 	}else{
         /* llamando los metodos recursivos para recorrer el arbol */
@@ -111,10 +112,16 @@ void AgregarNodoArbol(Mesa* mesa, Ficha* domino, Nodo *destino, int direccion){
  */
 void muestra_Recursivo(Nodo *actual){
    if(actual != NULL){
-      printf("[ %d | %d ]\n",actual->dato->valores[0],actual->dato->valores[1]);
-      muestra_Recursivo(actual->siguiente);
-      muestra_Recursivo(actual->arriba);
-      muestra_Recursivo(actual->abajo);
+     
+		if(actual->arriba != NULL)
+      		muestra_Recursivo(actual->arriba); 
+
+		muestra_Recursivo(actual->siguiente);
+	  	printf("[ %d | %d ][\n",actual->dato->valores[0],actual->dato->valores[1]);
+	  	
+		if(actual->abajo != NULL)
+			muestra_Recursivo(actual->abajo);
+	  	printf("\n]\n");
    }
 }
 
