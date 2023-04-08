@@ -17,6 +17,21 @@
 
 int main(){
 
+    int n=28;
+    Ficha ficha[n];
+    for (int i = 0; i <= 6; i++){
+        for(int j = i; j <= 6; j++){
+            printf(">%d|%d<\n",i,j);
+            ficha[i].valores[0] = i;
+            ficha[i].valores[1] = j;
+        }
+    }
+    printf("\n\n");
+    for (int i = 0; i < 28; i++){
+            printf("[%d|%d]\n",ficha[i].valores[0],ficha[i].valores[1]);
+    }
+
+
     Mesa *mesa = (Mesa *)calloc(sizeof(Mesa), 1);
 
     
@@ -31,10 +46,10 @@ int main(){
     n2->dato->valores[0] = 1;
     n2->dato->valores[1] = 0;
     n2->dato->salida = 1;
-    
+    /**
     Nodo *n3 = (Nodo *)calloc(sizeof(Nodo),1);
     n3->dato = (Ficha *)calloc(sizeof(Ficha),1);
-    n3->dato->valores[0] = 3;
+    n3->dato->valores[0] = 2;
     n3->dato->valores[1] = 1;
     n3->dato->salida = 1;
 
@@ -48,23 +63,27 @@ int main(){
     n5->dato = (Ficha *)calloc(sizeof(Ficha),1);
     n5->dato->valores[0] = 6;
     n5->dato->valores[1] = 3;
-    n5->dato->salida = 1;
-    
-
+    n5->dato->salida = 1;**/
+   
     AgregarNodoArbol(mesa,n1,NULL,0);
     AgregarNodoArbol(mesa,n2,n1,2);
-    AgregarNodoArbol(mesa,n3,n2,2);
+    /**AgregarNodoArbol(mesa,n3,n2,2);
     AgregarNodoArbol(mesa,n4,n1,0);
     AgregarNodoArbol(mesa,n5,n4,2);
-    Mostrar_Nodos(mesa);
+    Mostrar_Nodos(mesa);**/
 
     Lista *l = Fichas_Libres(mesa);
+    printf("Lista...\n");
     Mostrar_Lista(l);
-    Liberar_Lista(l);
 
-    if(n3->sig_auxiliar == NULL){
-        printf("Esta nulo\n");
-    }
+    printf("........\n\n");
+    int posicion;
+    int direccion;
+    int cruzado;
+    Nodo *nodo = Comparando_Lista(l,ficha,n, &posicion, &direccion, &cruzado);
+    printf("Posicion %d\n",posicion);
+    printf("ficha [%d|%d]   direccion %d  cruzado %d\n",ficha[posicion].valores[0],ficha[posicion].valores[1],direccion, cruzado);
+    Liberar_Lista(l);
 
     return 0;
 }

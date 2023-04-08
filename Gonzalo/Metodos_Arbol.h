@@ -120,7 +120,7 @@ void muestra_Recursivo(Nodo *actual){
 	  	printf("[ %d | %d ][\n",actual->dato->valores[0],actual->dato->valores[1]);
 	  	
 		if(actual->abajo != NULL)
-			muestra_Recursivo(actual->abajo);
+			muestra_Recursivo(actual->abajo);	
 	  	printf("\n]\n");
    }
 }

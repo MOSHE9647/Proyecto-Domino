@@ -16,7 +16,7 @@ int Sumando_Extremos_De_Mesa(int contador, Nodo* nuevo){
         }
     }else{
         contador += nuevo->dato->valores[nuevo->dato->salida];
-        printf("::Puntos %d +  %d \n",contador,nuevo->dato->valores[nuevo->dato->salida]);
+        printf("Puntos %d +  %d \n",contador,nuevo->dato->valores[nuevo->dato->salida]);
     }
     return contador;
 }
@@ -56,7 +56,7 @@ void Buscando_fichas_disponibles(Lista *lista, Nodo *actual){/**Metodo recursivo
     if(actual != NULL){
 		if(actual->dato->valores[0] == actual->dato->valores[1] && actual->cruzado == 0){
 			if(actual->siguiente == NULL || actual->arriba == NULL || actual->abajo == NULL){
-                lista->contador = Sumando_Extremos_De_Mesa(&lista->contador, actual);
+                lista->contador = Sumando_Extremos_De_Mesa(lista->contador, actual);
 				ingresar_Lista(lista, actual);
             }
 		}else if(actual->siguiente == NULL){
@@ -122,18 +122,160 @@ void Mostrando_posibles_Puntajes(Nodo *actual, int valor_x, int valor_y, int pun
         }
     printf(" [ %d | %d ]           Suma: %d\n", valor_x, valor_y, puntos);
 }
+void Selector_al_mayor(Nodo *destino,Nodo *actual,int *ficha_select, int i, int *mayor, int puntos){
+        destino = actual;
+        (*ficha_select) = i;
+        (*mayor) = puntos;   
+}
+Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_elegido, int *direccion, int *cruzado){
+    Nodo *destino = NULL;
+    /*Guarda cierto nodo destino y posicion de ficha
+    en caso de comparacion a mayor divisibles entre 5*/
+    Nodo *aux_div_5 = NULL;
+    int ficha_selct_div_5 = -1;
+    int direccion_1 = -1;
+    int cruzado_1 = 0; /*Cruzado es 0 y no cruzado es 1*/
 
-Nodo* Comparando_Lista(Lista *lista, Ficha *mazo[], int tamano , int *seleccion_f){
-    Nodo *aux = NULL;/*Guarda ciertos nodos en caso de comparacion a mayor divisibles entre 5*/
-    Ficha *aux_f = NULL;
+    /*En caso de que no hayase ninguno que sume puntos divisibles entre 5*/
+    Nodo *aux_No_div = NULL;
+    int ficha_selct = -1;
+    int direccion_2 = -1;
+    int cruzado_2 = 0; /*Cruzado es 0 y no cruzado es 1*/
+    /*Variables temporales*/
+    int puntos = 0;
+    int mayor_Div = 0, mayor_No_Div = 0,contador_nodo = 0;
+    Nodo *actual = lista->primero;
+  
+    while(actual != NULL){
+        int salida = actual->dato->salida;
+        for(int i = 0; i < tamano; i++){  
+            int valor_x = mazo[i].valores[0];
+            int valor_y = mazo[i].valores[1];
+            if((valor_x == valor_y) && (valor_x == actual->dato->valores[salida])){
+                    puntos = lista->contador;
+                    puntos = (puntos - actual->dato->valores[salida]) + mazo[i].valores[0] + mazo[i].valores[1];
+                    //Mostrando_posibles_Puntajes(actual, valor_x, valor_y, puntos, contador_nodo);
+                    if((puntos % 5 == 0)){
+                        if(puntos < mayor_Div ){
+                            Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
+                            cruzado_1 = 0;
+                        }
+                    }else if(puntos < mayor_No_Div){
+                        Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div,puntos);
+                        cruzado_2 = 0;
+                    } 
+                    
+                    puntos = lista->contador;             
+                    puntos = (puntos - actual->dato->valores[salida]) + mazo[i].valores[0];
+                    if((puntos % 5 == 0)){
+                        if(puntos < mayor_Div ){
+                            Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
+                            cruzado_1 = 1;
+                        }
+                    }else if(puntos < mayor_No_Div){
+                        Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div, puntos);
+                        cruzado_2 = 1;
+                    } 
+                  printf("Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
+            }else if((actual->dato->valores[0] == actual->dato->valores[1]) && (actual->cruzado == 0) && (valor_x == actual->dato->valores[0] || valor_y == actual->dato->valores[0])){
+                    puntos = lista->contador;
+                    if(actual->siguiente == NULL){
+                        if(mazo[i].valores[0] == actual->dato->valores[salida]){
+                            puntos += mazo[i].valores[1];
+                        }else if(mazo[i].valores[1] == actual->dato->valores[salida]){
+                            puntos += mazo[i].valores[0];
+                        }
+                        if((puntos % 5 == 0)){
+                            if(puntos < mayor_Div ){
+                                Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
+                                direccion_1 = 2;
+                            }
+                        }else if(puntos < mayor_No_Div){
+                            Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div, puntos);
+                            direccion_2 = 2;
+                        }  
+                    }
+                    if(actual->arriba == NULL){
+                            int aux;
+                            if(mazo[i].valores[0] == actual->dato->valores[salida]){
+                                aux = puntos - actual->dato->valores[salida] + mazo[i].valores[1];
+                            }else if(mazo[i].valores[1] == actual->dato->valores[salida]){
+                                aux = puntos - actual->dato->valores[salida] + mazo[i].valores[0];
+                            }
+                            if((aux % 5 == 0)){
+                                if(aux < mayor_Div ){
+                                    Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div,aux);
+                                    direccion_1 = 1;
+                                }
+                            }else if(aux < mayor_No_Div){
+                                Selector_al_mayor(aux_No_div,actual, &ficha_selct,i, &mayor_No_Div,aux);
+                                direccion_2 = 1;
+                            }    
+                    }
+                    if(actual->abajo == NULL){
+                            int aux;
+                            if(mazo[i].valores[0] == actual->dato->valores[salida]){
+                                aux = puntos - actual->dato->valores[salida] + mazo[i].valores[1];
+                            }else if(mazo[i].valores[1] == actual->dato->valores[salida]){
+                                aux = puntos - actual->dato->valores[salida] + mazo[i].valores[0];
+                            }
+                            if((aux % 5 == 0)){
+                                if(aux < mayor_Div ){
+                                    Selector_al_mayor(aux_div_5, actual, &ficha_selct_div_5, i, &mayor_Div,aux);
+                                    direccion_1 = 3;
+                                }
+                            }else if(aux < mayor_No_Div){
+                                    Selector_al_mayor(aux_No_div, actual, &ficha_selct, i, &mayor_No_Div, aux);
+                                    direccion_2 = 3;
+                            }
+                    }
+                    printf("Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
+            }else if(valor_x == actual->dato->valores[salida]){
+                    puntos = lista->contador;
+                    puntos = (puntos - actual->dato->valores[salida]) + mazo[i].valores[1];
+                    //Mostrando_posibles_Puntajes(actual, valor_x, valor_y, puntos, contador_nodo);
+                    if((puntos % 5 == 0)){
+                        if(puntos < mayor_Div ){
+                            Selector_al_mayor(aux_div_5,actual,&ficha_selct_div_5, i, &mayor_Div,puntos);
+                            direccion_1 = 2;
+                        }
+                    }else if(puntos < mayor_No_Div){
+                        Selector_al_mayor(aux_No_div, actual, &ficha_selct, i, &mayor_No_Div, puntos);
+                        direccion_2 = 2;
+                    }  
+                    printf("Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
+            }else if(valor_y == actual->dato->valores[salida]){
+                    puntos = lista->contador;
+                    puntos = (puntos - actual->dato->valores[salida]) + mazo[i].valores[0]; 
+                    //Mostrando_posibles_Puntajes(actual, valor_y, valor_x, puntos, contador_nodo);
+                    if((puntos % 5 == 0)){
+                        if(puntos < mayor_Div ){
+                            Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
+                            direccion_1 = 2;    
+                        }
+                    }else if(puntos < mayor_No_Div){
+                        Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div, puntos);
+                        direccion_2 = 2;
+                    }       
+                      printf("Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
+            } 
+        }
+        actual = actual->sig_auxiliar;
+    }
 
-    Nodo *aux_2 = NULL;/*En caso de que no hayase un que sume puntos divisibles entre 5*/
-    Ficha *aux_f_2 = NULL;
-    int mayor_Div = 0, mayor_No_Div = 0;
+    if(mayor_Div != 0 ){
+        (*posicion_elegido) = ficha_selct_div_5;
+        (*cruzado) = cruzado_1;
+        (*direccion) = direccion_1;
+        destino = aux_div_5;
+    }else{
+        (*posicion_elegido) = ficha_selct;
+        (*cruzado) = cruzado_2;
+        (*direccion) = direccion_2;
+        destino = aux_No_div;
+    }
 
-
-
-    return NULL;
+    return destino;
 }
 
 
