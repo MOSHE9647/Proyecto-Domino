@@ -153,25 +153,26 @@ void prueba () {
 
     for (int i = 0; i < 3; i++) {
         if (mesa->raiz == NULL) {
-        int pos = -1;
-        for (int i = 0; i < jugadores[0].canMazoJug; i++) {
-            if (jugadores[0].mazo[i].valores[0] == jugadores[0].mazo[i].valores[1]) {
-                pos = i;
-                break;
+            int pos = -1;
+            for (int i = 0; i < jugadores[0].canMazoJug; i++) {
+                if (jugadores[0].mazo[i].valores[0] == jugadores[0].mazo[i].valores[1]) {
+                    pos = i;
+                    break;
+                }
             }
-        }
-        if (pos == -1) { exit(1); }
-        
-        AgregarNodoArbol (mesa, &jugadores[0].mazo[pos], NULL, 0);
+            if (pos == -1) { exit(1); }
+            
+            AgregarNodoArbol (mesa, &jugadores[0].mazo[pos], NULL, 0);
+
+            delElement (jugadores[0].mazo, pos);
 
         } else {
             Lista *lista = Fichas_Libres(mesa);
             Nodo *destino = Comparando_Lista (lista, jugadores[0].mazo, jugadores[0].canMazoJug, &posicion, &direccion, &cruzado, &puntos);
             AgregarNodoArbol(mesa, &jugadores[0].mazo[posicion], destino, direccion);
-            printf ("Mesa Con Ficha\n\n");
-            Mostrar_Nodos (mesa);
             Mostrar_Lista (lista);
             Liberar_Lista(lista);
+            delElement (jugadores[0].mazo, posicion);
         }
         printf ("Mesa Con Ficha\n\n");
     }

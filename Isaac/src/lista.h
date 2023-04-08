@@ -135,14 +135,14 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
     Nodo *aux_div_5 = NULL;
     int ficha_selct_div_5 = -1;
     int direccion_1 = -1;
-    int cruzado_1 = 0; /*Cruzado es 0 y no cruzado es 1*/
+    int cruzado_1 = 0; /*Cruzado es 0 y no cruzado es 1 */
 
-    /*En caso de que no hayase ninguno que sume puntos divisibles entre 5*/
+    /* En caso de que no hayase ninguno que sume puntos divisibles entre 5 */
     Nodo *aux_No_div = NULL;
     int ficha_selct = -1;
     int direccion_2 = -1;
-    int cruzado_2 = 0; /*Cruzado es 0 y no cruzado es 1*/
-    /*Variables temporales*/
+    int cruzado_2 = 0; /* Cruzado es 0 y no cruzado es 1 */
+    /* Variables temporales */
     int puntos = 0;
     int mayor_Div = 0, mayor_No_Div = 0,contador_nodo = 0;
     Nodo *actual = lista->primero;
@@ -159,10 +159,12 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                         if(puntos > mayor_Div ){
                             Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
                             cruzado_1 = 0;
+                            aux_div_5 = actual;
                         }
                     }else if(puntos > mayor_No_Div){
                         Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div,puntos);
-                        cruzado_2 = 0;
+                        cruzado_2 = 0; 
+                        aux_No_div = actual;
                     } 
                     //printf("x==y Actual [%d|%d]   f [%d|%d]  p :%d\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y,puntos);
                     puntos = lista->contador;             
@@ -171,12 +173,14 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                         if(puntos > mayor_Div ){
                             Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
                             cruzado_1 = 1;
+                            aux_div_5 = actual;
                         }
                     }else if(puntos > mayor_No_Div){
                         Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div, puntos);
                         cruzado_2 = 1;
+                        aux_No_div = actual;
                     } 
-                    //printf("2x==y Actual [%d|%d]   f [%d|%d]  p :%d\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y,puntos);
+                   // printf("2x==y Actual [%d|%d]   f [%d|%d]  p :%d\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y,puntos);
             }else if((actual->dato->valores[0] == actual->dato->valores[1]) && (actual->cruzado == 0) && (valor_x == actual->dato->valores[0] || valor_y == actual->dato->valores[0])){
                     puntos = lista->contador;
                     if(actual->anterior == NULL){
@@ -188,11 +192,13 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                         if((puntos % 5 == 0)){
                             if(puntos > mayor_Div ){
                                 Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
-                                direccion_1 = 0;
+                                direccion_1 = 0; 
+                                aux_div_5 = actual;
                             }
                         }else if(puntos > mayor_No_Div){
                             Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div, puntos);
                             direccion_2 = 0;
+                            aux_No_div = actual;
                         } 
                     }
                     puntos = lista->contador;
@@ -206,10 +212,12 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                             if(puntos > mayor_Div ){
                                 Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
                                 direccion_1 = 2;
+                                aux_div_5 = actual;
                             }
                         }else if(puntos > mayor_No_Div){
                             Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div, puntos);
                             direccion_2 = 2;
+                            aux_No_div = actual;
                         }  
                     }
                     puntos = lista->contador;
@@ -224,10 +232,12 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                                 if(aux > mayor_Div ){
                                     Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div,aux);
                                     direccion_1 = 1;
+                                    aux_div_5 = actual;
                                 }
                             }else if(aux > mayor_No_Div){
                                 Selector_al_mayor(aux_No_div,actual, &ficha_selct,i, &mayor_No_Div,aux);
                                 direccion_2 = 1;
+                                aux_No_div = actual;
                             }    
                     }
                     puntos = lista->contador;
@@ -242,10 +252,12 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                                 if(aux > mayor_Div ){
                                     Selector_al_mayor(aux_div_5, actual, &ficha_selct_div_5, i, &mayor_Div,aux);
                                     direccion_1 = 3;
+                                    aux_div_5 = actual;
                                 }
                             }else if(aux > mayor_No_Div){
                                     Selector_al_mayor(aux_No_div, actual, &ficha_selct, i, &mayor_No_Div, aux);
                                     direccion_2 = 3;
+                                    aux_No_div = actual;
                             }
                     }
                     //printf("ax == bx Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
@@ -256,10 +268,12 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                         if(puntos > mayor_Div ){
                             Selector_al_mayor(aux_div_5,actual,&ficha_selct_div_5, i, &mayor_Div,puntos);
                             direccion_1 = 2;
+                            aux_div_5 = actual;
                         }
                     }else if(puntos > mayor_No_Div){
                         Selector_al_mayor(aux_No_div, actual, &ficha_selct, i, &mayor_No_Div, puntos);
                         direccion_2 = 2;
+                        aux_No_div = actual;
                     }  
                     //printf("x !=  Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
             }else if(valor_y == actual->dato->valores[salida]){
@@ -268,13 +282,15 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
                     if((puntos % 5 == 0)){
                         if(puntos > mayor_Div ){
                             Selector_al_mayor(aux_div_5,actual, &ficha_selct_div_5, i, &mayor_Div, puntos);
-                            direccion_1 = 2;    
+                            direccion_1 = 2;   
+                            aux_div_5 = actual; 
                         }
                     }else if(puntos > mayor_No_Div){
                         Selector_al_mayor(aux_No_div,actual, &ficha_selct, i, &mayor_No_Div, puntos);
                         direccion_2 = 2;
+                        aux_No_div = actual;
                     }       
-                      //printf("y != Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
+                    //printf("y != Actual [%d|%d]   f [%d|%d]\n",actual->dato->valores[0],actual->dato->valores[1],valor_x,valor_y );
             } 
         }
         actual = actual->sig_auxiliar;
