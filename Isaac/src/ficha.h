@@ -7,6 +7,7 @@
 *************************************************************/
 
 #include <stdlib.h>         /* Librería para el Uso de Rand, Srand y System */
+#include <stdio.h>          /* Librería para Operaciones de E/S */
 #include <time.h>           /* Librería para el Uso como Semilla de Srand   */
 
 #define MAX_COMER 10        /* Tamaño máximo de las Fichas para Comer */
@@ -18,6 +19,7 @@ typedef struct {
     int valores[2];         /* Valores que tiene la Ficha [Izq|Der]         */
     int numFicha;           /* Variable para el ordenamiento de las fichas  */
     int salida;             /* Variable para obtener la 'punta' de la Ficha */
+    int doble;
 } Ficha;
 
 /* VARIABLES GLOBALES */
@@ -48,6 +50,9 @@ void inicializarFichas () {
             listaMazoTotal[numFicha].valores[0] = i;
             listaMazoTotal[numFicha].valores[1] = j;
             listaMazoTotal[numFicha].salida = 0;
+            if (listaMazoTotal[numFicha].valores[0] == listaMazoTotal[numFicha].valores[1]) { 
+                listaMazoTotal[numFicha].doble == 1; 
+            }
             numFicha ++;
         }
     }

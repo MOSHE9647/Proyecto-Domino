@@ -9,13 +9,16 @@
     RELACIONADAS A UNA PARTIDA.
 ****************************************************************/
 
-#include "jugador.h"             /* Archivo de Cabecera de Jugador      */
 #include <semaphore.h>           /* Para uso de Semáforos en el Juego   */
 #include <pthread.h>             /* Para el uso de Hilos en el Juego    */
+#include "jugador.h"             /* Archivo de Cabecera de Jugador      */
+#include "lista.h"
+#include "mesa.h"
 
 /* VARIABLES GLOBALES */
 pthread_t players [MAX_PLAYERS]; /* Vector de Hilos para Jugadores           */
 sem_t turnoJug;                  /* Semáforo para el Turno de cada Jugador   */
+Mesa *mesa;
 
 /* FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
 // ** CTRL + Click para ir a la Funcion
@@ -122,6 +125,61 @@ void sysPause() {
     printf ("Press Enter to continue...");
     int c = getchar(); /* Simulamos la pausa */
     getchar();
+}
+
+void prueba () {
+    iniciarPartida(NEW, 2);
+
+    mesa = (Mesa*) calloc (sizeof(Mesa), 1);
+
+    int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
+
+    system ("clear");
+    printf ("Mesa Vacia\n\n");
+    Mostrar_Nodos (mesa);
+
+    for (int i = 0; i < canJug; i++) {
+        printf ("Datos del Jugador %d:\n", i+1);
+        printf ("Nombre:\t\t%s\n", jugadores[i].nom);
+        printf ("Puntos:\t\t%i\n", jugadores[i].puntos);
+        printf ("Total Puntos:\t%i\n", jugadores[i].totalPuntos);
+        printf ("Total Ganados:\t%i\n", jugadores[i].totalGanados);
+        printf ("Fichas:\n");
+        for (int j = 0; j < jugadores[i].canMazoJug; j++) {
+            printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
+        }
+        printf ("\n\n");
+    }
+
+    for (int i = 0; i < 3; i++) {
+        if (mesa->raiz == NULL) {
+        int pos = -1;
+        for (int i = 0; i < jugadores[0].canMazoJug; i++) {
+            if (jugadores[0].mazo[i].valores[0] == jugadores[0].mazo[i].valores[1]) {
+                pos = i;
+                break;
+            }
+        }
+        if (pos == -1) { exit(1); }
+        
+        AgregarNodoArbol (mesa, &jugadores[0].mazo[pos], NULL, 0);
+
+        } else {
+            Lista *lista = Fichas_Libres(mesa);
+            Nodo *destino = Comparando_Lista (lista, jugadores[0].mazo, jugadores[0].canMazoJug, &posicion, &direccion, &cruzado, &puntos);
+            AgregarNodoArbol(mesa, &jugadores[0].mazo[posicion], destino, direccion);
+            printf ("Mesa Con Ficha\n\n");
+            Mostrar_Nodos (mesa);
+            Mostrar_Lista (lista);
+            Liberar_Lista(lista);
+        }
+        printf ("Mesa Con Ficha\n\n");
+    }
+
+    printf ("Mesa Con Ficha\n\n");
+    Mostrar_Nodos (mesa);
+
+    sysPause();
 }
 
 #endif

@@ -77,7 +77,7 @@ int main () {
                 break;
             }
             case 3: {
-                aciertaPuntos(jugadores);
+                prueba ();
                 break;
             }
             case 4: {

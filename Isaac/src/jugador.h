@@ -7,7 +7,6 @@
 *************************************************************/
 
 #include "ficha.h"          /* Archivo de Cabecera de Fichas    */
-#include <stdio.h>          /* Librería para Operaciones de E/S */
 #include <string.h>         /* Para el uso de 'strcpy()'        */
 
 #define ARCHIVO "log.txt"   /* Ubicación del Registro del Programa     */
