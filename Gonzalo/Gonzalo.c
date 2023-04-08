@@ -16,6 +16,11 @@
 #include "Metodos_Lista.h"
 #define MAX 28
 Ficha ficha[MAX];
+
+void gotoxy(int x,int y){
+    printf("%c[%d;%df",0x1B,y,x);
+}
+
 int main(){
 
     int contador = 0;
@@ -76,7 +81,7 @@ int main(){
     printf("Lista...\n");
     Mostrar_Lista(l);
 
-    printf("........\n\n");
+    gotoxy(15,15);printf("........\n\n");
     int posicion;
     int direccion;
     int cruzado;
@@ -87,7 +92,7 @@ int main(){
     printf("Posicion %d\n",posicion);
     printf("ficha [%d|%d]   direccion %d  cruzado %d    puntos %d \n",ficha[posicion].valores[0],ficha[posicion].valores[1],direccion, cruzado,puntos);
     Liberar_Lista(l);
-
+    gotoxy(0,30); printf("..");
     return 0;
 }
 /**	
