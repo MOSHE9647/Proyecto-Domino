@@ -23,6 +23,5 @@ struct Lista{
 	Nodo *primero;          /* Guarda referencia el primer Nodo agregado a lista                            */
     Nodo *ultimo;           /* Guarda referencia al ultimo Nodo agregaddo a la lista                        */
     int contador;
-    int cantidad_Nodos;
 };
 #endif

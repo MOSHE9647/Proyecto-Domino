@@ -14,16 +14,16 @@
 #include "Arbol.h"
 #include "Metodos_Arbol.h"
 #include "Metodos_Lista.h"
-
+#define MAX 28
+Ficha ficha[MAX];
 int main(){
 
-    int n=28;
-    Ficha ficha[n];
+    int contador = 0;
     for (int i = 0; i <= 6; i++){
         for(int j = i; j <= 6; j++){
-            printf(">%d|%d<\n",i,j);
-            ficha[i].valores[0] = i;
-            ficha[i].valores[1] = j;
+            ficha[contador].valores[0] = i;
+            ficha[contador].valores[1] = j;
+            contador++;
         }
     }
     printf("\n\n");
@@ -37,14 +37,14 @@ int main(){
     
     Nodo *n1 = (Nodo *)calloc(sizeof(Nodo),1);
     n1->dato = (Ficha *)calloc(sizeof(Ficha),1);
-    n1->dato->valores[0] = 0;
-    n1->dato->valores[1] = 0;
+    n1->dato->valores[0] = 4;
+    n1->dato->valores[1] = 4;
     n1->dato->salida = 1;
 
     Nodo *n2 = (Nodo *)calloc(sizeof(Nodo),1);
     n2->dato = (Ficha *)calloc(sizeof(Ficha),1);
     n2->dato->valores[0] = 1;
-    n2->dato->valores[1] = 0;
+    n2->dato->valores[1] = 4;
     n2->dato->salida = 1;
     /**
     Nodo *n3 = (Nodo *)calloc(sizeof(Nodo),1);
@@ -80,9 +80,12 @@ int main(){
     int posicion;
     int direccion;
     int cruzado;
-    Nodo *nodo = Comparando_Lista(l,ficha,n, &posicion, &direccion, &cruzado);
+    int puntos;
+    int n = 28;
+    printf("Puntos sumados : %d\n",l->contador);
+    Nodo *nodo = Comparando_Lista(l,ficha,n, &posicion, &direccion, &cruzado, &puntos);
     printf("Posicion %d\n",posicion);
-    printf("ficha [%d|%d]   direccion %d  cruzado %d\n",ficha[posicion].valores[0],ficha[posicion].valores[1],direccion, cruzado);
+    printf("ficha [%d|%d]   direccion %d  cruzado %d    puntos %d \n",ficha[posicion].valores[0],ficha[posicion].valores[1],direccion, cruzado,puntos);
     Liberar_Lista(l);
 
     return 0;
