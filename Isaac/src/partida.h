@@ -17,6 +17,7 @@
 
 /* VARIABLES GLOBALES */
 pthread_t players [MAX_PLAYERS]; /* Vector de Hilos para Jugadores           */
+int primerFicha[3] = {6, 0, 0};
 sem_t turnoJug;                  /* Semáforo para el Turno de cada Jugador   */
 Mesa *mesa;
 
@@ -25,6 +26,7 @@ Mesa *mesa;
 void iniciarPartida(int type, int Jugs); /* Funcion para Iniciar la Partida con 'n' Jugadores */
 void aciertaPuntos(Jugador *j);          /* Función para Manejar el Puntaje del Juego         */
 void comerFichas(Jugador *j);            /* Para que Jugador tome una Ficha del mazo          */
+void ponerFicha(Jugador *j);             /* Funcion para Poner una Ficha en la Mesa           */
 void repartirFichas ();                  /* Función que Reparte Fichas a cada Jugador         */
 void finJuego();                         /* Función que se llama al Finalizar el Juego        */
 void sysPause();                         /* Funcion que realiza una pausa en la Terminal      */
@@ -32,13 +34,35 @@ void sysPause();                         /* Funcion que realiza una pausa en la 
 /*********************************** FUNCIONES ***********************************/
 // Iniciamos una Nueva Partida:
 void iniciarPartida(int type, int Jugs) {
+    mesa = (Mesa*) calloc (sizeof(Mesa), 1); /* Creamos la Mesa del Juego */
     if (type == NEW) {
         canJug = Jugs;              /* Indicamos la Cantidad de Jugadores solicitada      */
         crearJugadores(NEW);        /* Creamos a cada uno de los Jugadores segun 'canJug' */
     } else { crearJugadores(OLD); } /* Creamos los Jugadores a partir de un Archivo       */
-    
     repartirFichas();   /* Creamos y repartimos las Fichas a Cada Jugador     */
-    /* En teoría aquí empiezan los hilos */
+    
+    while (!primerFicha[3]) {
+        for (int i = 0; i < canJug; i++) {
+            ponerFicha (&jugadores[i]);
+            if ((primerFicha[1] + 1) == canJug) {
+                primerFicha[0]--;
+                i = 0;
+            }
+            if (primerFicha[0] < 0) {
+                printf ("Ningún Jugador posee una Ficha Doble!!\n");
+                printf ("Volvemos a Repartir...\n\n");
+                sysPause();
+                repartirFichas();
+                primerFicha[0] = 6;
+                primerFicha[1] = 0;
+                break;
+            }
+        }
+    }
+    system("clear");
+    printf ("Mesa:\n\n");
+    Mostrar_Nodos(mesa);
+    sysPause();
 }
 
 // Función para Repartir Fichas:
@@ -127,29 +151,43 @@ void sysPause() {
     getchar();
 }
 
-void prueba () {
-    iniciarPartida(NEW, 2);
-
-    mesa = (Mesa*) calloc (sizeof(Mesa), 1);
-
-    int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
-
-    system ("clear");
-    printf ("Mesa Vacia\n\n");
-    Mostrar_Nodos (mesa);
-
-    for (int i = 0; i < canJug; i++) {
-        printf ("Datos del Jugador %d:\n", i+1);
-        printf ("Nombre:\t\t%s\n", jugadores[i].nom);
-        printf ("Puntos:\t\t%i\n", jugadores[i].puntos);
-        printf ("Total Puntos:\t%i\n", jugadores[i].totalPuntos);
-        printf ("Total Ganados:\t%i\n", jugadores[i].totalGanados);
-        printf ("Fichas:\n");
-        for (int j = 0; j < jugadores[i].canMazoJug; j++) {
-            printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
+void ponerFicha (Jugador *j) {
+    int pos = -1; /* Posición de la Ficha en el Mazo del Jugador */
+    if (mesa->raiz == NULL) {
+        for (int i = 0; i < j->canMazoJug; i++) {
+            if (j->mazo[i].doble && j->mazo[i].valores[0] == primerFicha[0]) {
+                pos = i;
+                break;
+            }
         }
-        printf ("\n\n");
+        if (pos == -1) { 
+            primerFicha[1]++;
+            return; 
+        }
+        AgregarNodoArbol (mesa, &j->mazo[pos], NULL, 0);
+        delElement (j->mazo, pos);
+        primerFicha[3] = TRUE;
+    } else {
+        int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
+        Lista *lista = Fichas_Libres(mesa);
+        Nodo *destino = Comparando_Lista (lista, j->mazo, j->canMazoJug, &posicion, &direccion, &cruzado, &puntos);
+        if (destino != NULL) {
+            AgregarNodoArbol(mesa, &j->mazo[posicion], destino, direccion);
+            Mostrar_Lista (lista);
+            delElement (j->mazo, posicion);
+            if (puntos != 0) { 
+                j->puntos += puntos / 5;
+                j->totalPuntos += puntos; 
+            }
+        } else {
+            comerFichas (j);
+        }
+        Liberar_Lista(lista);
+        sysPause();
     }
+}
+
+void prueba () {
 
     for (int i = 0; i < 3; i++) {
         if (mesa->raiz == NULL) {
@@ -162,17 +200,20 @@ void prueba () {
             }
             if (pos == -1) { exit(1); }
             
-            AgregarNodoArbol (mesa, &jugadores[0].mazo[pos], NULL, 0);
-
-            delElement (jugadores[0].mazo, pos);
+            
 
         } else {
+            int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
             Lista *lista = Fichas_Libres(mesa);
             Nodo *destino = Comparando_Lista (lista, jugadores[0].mazo, jugadores[0].canMazoJug, &posicion, &direccion, &cruzado, &puntos);
-            AgregarNodoArbol(mesa, &jugadores[0].mazo[posicion], destino, direccion);
-            Mostrar_Lista (lista);
+            if (destino != NULL) {
+                AgregarNodoArbol(mesa, &jugadores[0].mazo[posicion], destino, direccion);
+                Mostrar_Lista (lista);
+                delElement (jugadores[0].mazo, posicion);
+            } else {
+                comerFichas (&jugadores[0]);
+            }
             Liberar_Lista(lista);
-            delElement (jugadores[0].mazo, posicion);
         }
         printf ("Mesa Con Ficha\n\n");
     }

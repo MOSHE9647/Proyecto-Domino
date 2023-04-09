@@ -51,7 +51,7 @@ void inicializarFichas () {
             listaMazoTotal[numFicha].valores[1] = j;
             listaMazoTotal[numFicha].salida = 0;
             if (listaMazoTotal[numFicha].valores[0] == listaMazoTotal[numFicha].valores[1]) { 
-                listaMazoTotal[numFicha].doble == 1; 
+                listaMazoTotal[numFicha].doble = 1; 
             }
             numFicha ++;
         }

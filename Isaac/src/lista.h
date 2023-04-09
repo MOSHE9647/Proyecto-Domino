@@ -304,7 +304,7 @@ Nodo* Comparando_Lista(Lista *lista, Ficha mazo[], int tamano, int *posicion_ele
         destino = aux_div_5;
     }else{
         (*posicion_elegido) = ficha_selct;
-        (*puntos_sumados) = mayor_No_Div;
+        (*puntos_sumados) = 0;
         (*cruzado) = cruzado_2;
         (*direccion) = direccion_2;
         destino = aux_No_div;
