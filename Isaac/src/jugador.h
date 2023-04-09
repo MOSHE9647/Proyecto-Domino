@@ -25,6 +25,7 @@ typedef struct {
     int totalPuntos;        /* Cantidad total de puntos que posee cada Jugador      */
     int canMazoJug;         /* Cantidad de Fichas que posee cada Jugador en el Mazo */
     int puntos;             /* Cantidad de puntos que lleva el Jugador por partida  */
+    int turno;
 } Jugador;
 
 /* VARIABLES GLOBALES */
@@ -71,6 +72,14 @@ void crearJugadores (int type) {
             scanf ("%s", jugadores[i].nom);
         }
     }
+    srand (time(NULL));
+    for (int i = 0; i < canJug; i++) {
+        int turno = rand() % 4;
+        jugadores[i].turno = turno;
+        system("clear");
+        printf("Turno del Jugador %i: \n", jugadores[i].turno);
+    }
+    system ("pause");
     system ("clear");
 }
 

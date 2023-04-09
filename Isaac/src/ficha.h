@@ -31,7 +31,7 @@ int totalFichas = DOMINO;               /* Para Manejo de Vectores en el Juego *
 // ** CTRL + Click para ir a la Funcion
 void revolverFichas (Ficha f[], int size);  /* Función para Revolver una Lista de Fichas    */
 void ordenarFichas (Ficha f[], int size);   /* Función para Ordenar una Lista de Fichas     */
-void delElement (Ficha f[], int pos);       /* Funcion para Eliminar Elementos de un Vector */
+void delElement (Ficha f[], int pos, int *size);       /* Funcion para Eliminar Elementos de un Vector */
 void inicializarFichas ();                  /* Inicializa las Variables de 'listaMazoTotal' */
 
 /****************************************** FUNCIONES ******************************************/
@@ -95,15 +95,16 @@ void ordenarFichas (Ficha f[], int size) {
 }
 
 // Función para Eliminar Elementos de un Vector:
-void delElement (Ficha f[], int pos) {
-    for (int i = pos; i < totalFichas; i++) {
+void delElement (Ficha f[], int pos, int *size) {
+    for (int i = pos; i < *size; i++) {
         /*******************************************
             Corremos el Elemento una Posición a la
-            Derecha y Decrementamos 'totalFichas'
+            Derecha y Decrementamos el Tamaño del
+            Vector de Fichas pasado como Argumento
         ********************************************/
         f[i] = f[i + 1];
     }
-    totalFichas--;
+    (*size)--;
 }
 
 #endif

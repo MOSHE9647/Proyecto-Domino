@@ -77,7 +77,7 @@ int main () {
                 break;
             }
             case 3: {
-                prueba ();
+                //prueba ();
                 break;
             }
             case 4: {

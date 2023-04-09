@@ -15,10 +15,15 @@
 #include "lista.h"
 #include "mesa.h"
 
-/* VARIABLES GLOBALES */
+/* SEMAFOROS (HILOS) */
 pthread_t players [MAX_PLAYERS]; /* Vector de Hilos para Jugadores           */
-int primerFicha[3] = {6, 0, 0};
-sem_t turnoJug;                  /* Semáforo para el Turno de cada Jugador   */
+sem_t mesa_arbol;
+sem_t fichasComer;
+sem_t primera;
+sem_t turno;
+
+/* VARIABLES GLOBALES */
+int primerFicha[3] = {6, 0, FALSE};
 Mesa *mesa;
 
 /* FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
@@ -59,6 +64,7 @@ void iniciarPartida(int type, int Jugs) {
             }
         }
     }
+    ponerFicha(&jugadores[0]);
     system("clear");
     printf ("Mesa:\n\n");
     Mostrar_Nodos(mesa);
@@ -76,8 +82,8 @@ void repartirFichas () {
         for (int i = 0; i < canJug; i++) {
             jugadores[i].canMazoJug = canFichasJug;
             for (int j = 0; j < canFichasJug; j++) {
-                jugadores[i].mazo[j] = listaMazoTotal[0]; /* Asignamos la Ficha al Mazo del Jugador */
-                delElement(listaMazoTotal, 0);            /* Eliminamos la Ficha de la Lista        */
+                jugadores[i].mazo[j] = listaMazoTotal[0];    /* Asignamos la Ficha al Mazo del Jugador */
+                delElement(listaMazoTotal, 0, &totalFichas); /* Eliminamos la Ficha de la Lista        */
             }
             ordenarFichas (jugadores[i].mazo, canFichasJug); /* Ordenamos las Fichas del Jugador    */
         }
@@ -105,7 +111,7 @@ void comerFichas (Jugador *j) {
     if (j->canMazoJug < MAX_TILES) {
         revolverFichas(listaFichasParaComer, totalFichas);
         j->mazo[j->canMazoJug + 1] = listaFichasParaComer[0];
-        delElement (listaFichasParaComer, 0);
+        delElement (listaFichasParaComer, 0, &totalFichas);
         ordenarFichas(listaFichasParaComer, totalFichas);
         j->canMazoJug++;
     }
@@ -165,8 +171,9 @@ void ponerFicha (Jugador *j) {
             return; 
         }
         AgregarNodoArbol (mesa, &j->mazo[pos], NULL, 0);
-        delElement (j->mazo, pos);
+        delElement (j->mazo, pos, &j->canMazoJug);
         primerFicha[3] = TRUE;
+        printf ("Jugador %i a puesto la Ficha [%i|%i] en la mesa", j->turno, j->mazo[pos].valores[0], j->mazo[pos].valores[1]);
     } else {
         int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
         Lista *lista = Fichas_Libres(mesa);
@@ -174,7 +181,7 @@ void ponerFicha (Jugador *j) {
         if (destino != NULL) {
             AgregarNodoArbol(mesa, &j->mazo[posicion], destino, direccion);
             Mostrar_Lista (lista);
-            delElement (j->mazo, posicion);
+            delElement (j->mazo, posicion, &j->canMazoJug);
             if (puntos != 0) { 
                 j->puntos += puntos / 5;
                 j->totalPuntos += puntos; 
@@ -187,41 +194,36 @@ void ponerFicha (Jugador *j) {
     }
 }
 
-void prueba () {
+// SEMAFORO:
+void* jugar (void *arg) {
+    int ID = *(int *) arg;
 
-    for (int i = 0; i < 3; i++) {
-        if (mesa->raiz == NULL) {
-            int pos = -1;
-            for (int i = 0; i < jugadores[0].canMazoJug; i++) {
-                if (jugadores[0].mazo[i].valores[0] == jugadores[0].mazo[i].valores[1]) {
-                    pos = i;
-                    break;
-                }
+    sem_wait (&turno);
+    printf("Turno del Jugador %i:\n", ID);
+    
+    sem_wait (&mesa_arbol);
+    while (!primerFicha[3]) {
+        for (int i = 0; i < canJug; i++) {
+            ponerFicha (&jugadores[i]);
+            if ((primerFicha[1] + 1) == canJug) {
+                primerFicha[0]--;
+                i = 0;
             }
-            if (pos == -1) { exit(1); }
-            
-            
-
-        } else {
-            int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
-            Lista *lista = Fichas_Libres(mesa);
-            Nodo *destino = Comparando_Lista (lista, jugadores[0].mazo, jugadores[0].canMazoJug, &posicion, &direccion, &cruzado, &puntos);
-            if (destino != NULL) {
-                AgregarNodoArbol(mesa, &jugadores[0].mazo[posicion], destino, direccion);
-                Mostrar_Lista (lista);
-                delElement (jugadores[0].mazo, posicion);
-            } else {
-                comerFichas (&jugadores[0]);
+            if (primerFicha[0] < 0) {
+                printf ("Ningún Jugador posee una Ficha Doble!!\n");
+                printf ("Volvemos a Repartir...\n\n");
+                sysPause();
+                repartirFichas();
+                primerFicha[0] = 6;
+                primerFicha[1] = 0;
+                break;
             }
-            Liberar_Lista(lista);
         }
-        printf ("Mesa Con Ficha\n\n");
     }
+    ponerFicha(&jugadores[ID]);
+    sem_post (&mesa_arbol);
 
-    printf ("Mesa Con Ficha\n\n");
-    Mostrar_Nodos (mesa);
-
-    sysPause();
+    sem_post (&turno);
 }
 
 #endif
