@@ -37,6 +37,7 @@ int canJug = 0;                 /* Cantidad de Jugadores por partida        */
 // ** CTRL + Click para ir a la Funcion
 void crearJugadores (int type); /* Función para Crear a cada Jugador               */
 int verificarDobles ();         /* Verifica si Existen más de 4 Dobles por Jugador */
+void sysPause();                         /* Funcion que realiza una pausa en la Terminal      */
 
 /*********************************** FUNCIONES ***********************************/
 // Función para Crear a los Jugadores:
@@ -74,12 +75,12 @@ void crearJugadores (int type) {
     }
     srand (time(NULL));
     for (int i = 0; i < canJug; i++) {
-        int turno = rand() % 4;
-        jugadores[i].turno = turno;
+        int turno = rand() % canJug;
+        jugadores[i].turno = i;
         system("clear");
         printf("Turno del Jugador %i: \n", jugadores[i].turno);
     }
-    system ("pause");
+    sysPause();
     system ("clear");
 }
 
@@ -104,4 +105,22 @@ int verificarDobles () {
     }
     return FALSE;
 }
+
+/************************************* EXTRA *************************************/
+// Funcion que realiza una pausa en la Terminal:
+void sysPause() {
+    /********************************************
+        Esta funcion se utiliza para realizar
+        una pausa en la terminal con el fin de
+        poder ver mensajes y demás información
+        que se vaya a mostrar por pantalla.
+        
+        **Esta funcion se creó como alternativa
+        al system("pause") que existe en Windows.
+    *********************************************/
+    printf ("Press Enter to continue...");
+    int c = getchar(); /* Simulamos la pausa */
+    getchar();
+}
+
 #endif

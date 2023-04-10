@@ -65,7 +65,7 @@ int main () {
                 printf ("\t Digite una Opción [2-7]: ");
                 scanf  ("%i", &opc); system ("clear");
                 iniciarPartida(NEW, opc);
-                imprimir ();/**/
+                //imprimir ();/**/
                 sysPause();/**/
                 break;
             }

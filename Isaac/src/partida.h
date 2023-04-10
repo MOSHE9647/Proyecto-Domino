@@ -16,7 +16,7 @@
 #include "mesa.h"
 
 /* SEMAFOROS (HILOS) */
-pthread_t players [MAX_PLAYERS]; /* Vector de Hilos para Jugadores           */
+void* jugar (void *arg);
 sem_t mesa_arbol;
 sem_t fichasComer;
 sem_t primera;
@@ -34,7 +34,6 @@ void comerFichas(Jugador *j);            /* Para que Jugador tome una Ficha del 
 void ponerFicha(Jugador *j);             /* Funcion para Poner una Ficha en la Mesa           */
 void repartirFichas ();                  /* Función que Reparte Fichas a cada Jugador         */
 void finJuego();                         /* Función que se llama al Finalizar el Juego        */
-void sysPause();                         /* Funcion que realiza una pausa en la Terminal      */
 
 /*********************************** FUNCIONES ***********************************/
 // Iniciamos una Nueva Partida:
@@ -46,7 +45,22 @@ void iniciarPartida(int type, int Jugs) {
     } else { crearJugadores(OLD); } /* Creamos los Jugadores a partir de un Archivo       */
     repartirFichas();   /* Creamos y repartimos las Fichas a Cada Jugador     */
     
-    while (!primerFicha[3]) {
+    // sem_init(&turno, 1, 1);
+    // sem_init(&mesa_arbol, 1, 1);
+    // pthread_t players[canJug];
+
+    // for (int i = 0; i < canJug; i++) {
+    //     pthread_create(&players[i], NULL, jugar, &i);
+    // }
+
+    // for (int i = 0; i < canJug; i++) {
+    //     pthread_join(players[i], NULL);
+    // }
+
+    // sem_destroy(&turno);
+    // sem_destroy(&mesa_arbol);
+
+    while (!primerFicha[2]) {
         for (int i = 0; i < canJug; i++) {
             ponerFicha (&jugadores[i]);
             if ((primerFicha[1] + 1) == canJug) {
@@ -65,10 +79,6 @@ void iniciarPartida(int type, int Jugs) {
         }
     }
     ponerFicha(&jugadores[0]);
-    system("clear");
-    printf ("Mesa:\n\n");
-    Mostrar_Nodos(mesa);
-    sysPause();
 }
 
 // Función para Repartir Fichas:
@@ -140,25 +150,24 @@ void aciertaPuntos(Jugador *j) {
     fclose(archivo);
 }
 
-/************************************* EXTRA *************************************/
-// Funcion que realiza una pausa en la Terminal:
-void sysPause() {
-    /********************************************
-        Esta funcion se utiliza para realizar
-        una pausa en la terminal con el fin de
-        poder ver mensajes y demás información
-        que se vaya a mostrar por pantalla.
-        
-        **Esta funcion se creó como alternativa
-        al system("pause") que existe en Windows.
-    *********************************************/
-    printf ("Press Enter to continue...");
-    int c = getchar(); /* Simulamos la pausa */
-    getchar();
+void finJuego() {
+    system("clear");
+    printf ("Fin del Juego");
+    printf ("Mesa:\n\n");
+    Mostrar_Nodos(mesa);
+    sysPause();
 }
+
+
 
 void ponerFicha (Jugador *j) {
     int pos = -1; /* Posición de la Ficha en el Mazo del Jugador */
+    for (int i = 0; i < j->canMazoJug; i++) {
+        printf ("Mazo Jugador %s", j->nom);
+        printf ("\t#%i =\t[%i|%i]\n", i + 1, j->mazo[i].valores[0], j->mazo[i].valores[1]);
+    }
+    printf ("\n\n");
+
     if (mesa->raiz == NULL) {
         for (int i = 0; i < j->canMazoJug; i++) {
             if (j->mazo[i].doble && j->mazo[i].valores[0] == primerFicha[0]) {
@@ -171,9 +180,9 @@ void ponerFicha (Jugador *j) {
             return; 
         }
         AgregarNodoArbol (mesa, &j->mazo[pos], NULL, 0);
+        printf ("Jugador %i puso la Ficha [%i|%i] en la mesa, pos = %i\n", j->turno, j->mazo[pos].valores[0], j->mazo[pos].valores[1], pos);
         delElement (j->mazo, pos, &j->canMazoJug);
-        primerFicha[3] = TRUE;
-        printf ("Jugador %i a puesto la Ficha [%i|%i] en la mesa", j->turno, j->mazo[pos].valores[0], j->mazo[pos].valores[1]);
+        primerFicha[2] = TRUE;
     } else {
         int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
         Lista *lista = Fichas_Libres(mesa);
@@ -187,10 +196,9 @@ void ponerFicha (Jugador *j) {
                 j->totalPuntos += puntos; 
             }
         } else {
-            comerFichas (j);
+            totalFichas > 0 ? comerFichas(j) : finJuego();
         }
         Liberar_Lista(lista);
-        sysPause();
     }
 }
 
@@ -202,7 +210,8 @@ void* jugar (void *arg) {
     printf("Turno del Jugador %i:\n", ID);
     
     sem_wait (&mesa_arbol);
-    while (!primerFicha[3]) {
+    printf ("Buscando Ficha Doble\n");
+    while (!primerFicha[2]) {
         for (int i = 0; i < canJug; i++) {
             ponerFicha (&jugadores[i]);
             if ((primerFicha[1] + 1) == canJug) {
@@ -216,6 +225,7 @@ void* jugar (void *arg) {
                 repartirFichas();
                 primerFicha[0] = 6;
                 primerFicha[1] = 0;
+                primerFicha[2] = FALSE;
                 break;
             }
         }
@@ -224,6 +234,7 @@ void* jugar (void *arg) {
     sem_post (&mesa_arbol);
 
     sem_post (&turno);
+    pthread_exit(NULL);
 }
 
 #endif
