@@ -11,7 +11,7 @@
 #include <time.h>           /* Librería para el Uso como Semilla de Srand   */
 
 #define MAX_COMER 10        /* Tamaño máximo de las Fichas para Comer */
-#define MAX_TILES 9         /* Cantidad máxima de Fichas por Jugador  */
+#define MAX_TILES 18        /* Cantidad máxima de Fichas por Jugador  */
 #define DOMINO 28           /* Cantidad de Fichas que posee el Juego  */
 
 /* ESTRUCTURA PARA LAS FICHAS */

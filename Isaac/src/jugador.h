@@ -76,15 +76,12 @@ void crearJugadores (int type) {
     srand (time(NULL));
     for (int i = 0; i < canJug; i++) {
         int turno = rand() % canJug;
-        jugadores[i].turno = i;
+        jugadores[i].turno = turno;
         system("clear");
-        printf("Turno del Jugador %i: \n", jugadores[i].turno);
     }
-    sysPause();
-    system ("clear");
 }
 
-// Función para Verficiar que no Existan Dobles:
+// Función para Verficiar que no Existan Más de 4 Dobles:
 int verificarDobles () {
     /******************************************************
         Recorremos el mazo de cada jugador buscando a ver

@@ -66,7 +66,7 @@ int main () {
                 scanf  ("%i", &opc); system ("clear");
                 iniciarPartida(NEW, opc);
                 //imprimir ();/**/
-                sysPause();/**/
+                //sysPause();/**/
                 break;
             }
             case 2: {
