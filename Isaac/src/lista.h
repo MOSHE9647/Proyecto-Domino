@@ -37,12 +37,13 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 		}else{
 			Nodo *actual = lista->primero;
             int salida = nodo->dato->salida;
-			while (actual != NULL){
+			while (actual->sig_auxiliar != NULL){
                 int auxiliar = actual->sig_auxiliar->dato->salida;
 				if(nodo->dato->valores[salida] <= actual->sig_auxiliar->dato->valores[auxiliar]){
                     nodo->sig_auxiliar = actual->sig_auxiliar;
 					actual->sig_auxiliar = nodo;
-                    actual = lista->ultimo;
+                    //actual = lista->ultimo;
+                    break;
 				}
 				actual = actual->sig_auxiliar;
 			}

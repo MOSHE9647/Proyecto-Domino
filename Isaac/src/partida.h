@@ -18,7 +18,6 @@
 
 /* VARIABLES GLOBALES */
 pthread_t players[MAX_PLAYERS];
-int finPartida = FALSE;
 sem_t mutex;
 Mesa *mesa;
 
@@ -44,7 +43,6 @@ void iniciarPartida(int type, int Jugs) {
         crearJugadores(NEW);        /* Creamos a cada uno de los Jugadores segun 'canJug' */
     } else { 
         crearJugadores(OLD);        /* Creamos los Jugadores a partir de un Archivo       */
-        finPartida = FALSE;
     } 
     repartirFichas();               /* Creamos y repartimos las Fichas a Cada Jugador     */
 
@@ -63,7 +61,6 @@ void iniciarPartida(int type, int Jugs) {
         printf ("Repartiendo de Nuevo...\n");
         sleep(2); system("clear");
         repartirFichas();
-        sysPause();
     }
     for (int i = temp->turno + 1; i < canJug; i++) {
         if (i == canJug - 1) {
@@ -170,7 +167,7 @@ void finJuego() {
     printf ("\t║  JUGADOR        PTS     WINS  ║\n");
     printf ("\t║  ═══════════════════════════  ║\n");
     for (int i = 0; i < canJug; i++) {
-        printf ("\t║  %s\t   %i\t %i\t║\n", jugadores[i].nom, jugadores[i].puntos, jugadores[i].totalGanados);
+        printf ("\t║  %s\t   %i\t  %i\t║\n", jugadores[i].nom, jugadores[i].puntos, jugadores[i].totalGanados);
         if (jugadores[i].puntos > puntajeMayor) { 
             puntajeMayor = jugadores[i].puntos;
             strcpy (ganador, jugadores[i].nom);
@@ -183,10 +180,9 @@ void finJuego() {
     printf ("\t║                               ║\n");
     printf ("\t║     GANADOR:    %s\t\t║\n", ganador);
     printf ("\t╚═══════════════════════════════╝\n\n");
-
-    finPartida = TRUE;
+    
     aciertaPuntos();
-    return;
+    exit(0);
 }
 
 void ponerFicha (Jugador *j, int pos) {
@@ -211,6 +207,8 @@ void ponerFicha (Jugador *j, int pos) {
                 printf ("Adquiere %i Puntos\n\n", (puntos / 5));
             }
         } else {
+            printf ("No posee Jugadas\n");
+            Mostrar_Lista (lista);
             printf ("%s tuvo que Comer una Ficha y pierde turno\n", j->nom);
             comerFichas(j);
         }

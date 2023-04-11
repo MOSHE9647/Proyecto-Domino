@@ -46,9 +46,9 @@ int main () {
             }
             case 2: {
                 system ("clear");
-                iniciarPartida(OLD, 0);
                 imprimir();/**/
                 sysPause();/**/
+                iniciarPartida(OLD, 0);
                 break;
             }
             case 3: {
