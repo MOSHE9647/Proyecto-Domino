@@ -1,4 +1,4 @@
-#include "Isaac/src/partida.h"
+#include "src/partida.h"
 
 /************************************************************
     ARCHIVO MAIN DEL JUEGO, AQUÍ SOLO APARECE EL MENU DONDE
@@ -22,12 +22,11 @@ int main () {
         printf ("\t║     4. Salir             ║\n");
         printf ("\t╚══════════════════════════╝\n");
         printf ("\t    Digite una Opción: ");
-        scanf  ("%i", &opc);
+        scanf  ("%i", &opc); system ("clear");
 
         switch (opc) {
             case 1: {
                 opc = 0;
-                system ("clear");
                 printf ("\n");
                 printf ("\t      ╔═══════════════╗\n");
                 printf ("\t╔═════╣  NUEVO JUEGO  ╠═════╗\n");
@@ -45,14 +44,19 @@ int main () {
                 break;
             }
             case 2: {
-                system ("clear");
-                imprimir();/**/
-                sysPause();/**/
+                printf ("Iniciando Partida desde Archivo 'log.txt'.\n");
+                sleep(1); system("clear");
+                printf ("Iniciando Partida desde Archivo 'log.txt'..\n");
+                sleep(1); system("clear");
+                printf ("Iniciando Partida desde Archivo 'log.txt'...\n");
+                sleep(1); system("clear");
+                printf ("Iniciando Partida desde Archivo 'log.txt'....\n");
+                sleep(1); system("clear");
                 iniciarPartida(OLD, 0);
                 break;
             }
             case 3: {
-                //prueba ();
+                puntuaciones();
                 break;
             }
             case 4: {

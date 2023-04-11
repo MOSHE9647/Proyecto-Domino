@@ -1,4 +1,0 @@
-git status
-git add nombre_archivo
-git commit -m "Cualquier mensaje"
-git push -uf origin main

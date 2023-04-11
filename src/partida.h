@@ -26,12 +26,12 @@ Mesa *mesa;
 void iniciarPartida(int type, int Jugs); /* Funcion para Iniciar la Partida con 'n' Jugadores */
 void ponerFicha (Jugador *j, int pos);   /* Funcion para Poner una Ficha en la Mesa           */
 void comerFichas(Jugador *j);            /* Para que Jugador tome una Ficha del mazo          */
-Jugador *buscarDobles ();
-void *jugar (void *arg);
+Jugador *buscarDobles ();                /* Busca y Tira la Primera Ficha en la Mesa          */
+void *jugar (void *arg);                 /* Acción de Cada Jugador con Hilos                  */
 void repartirFichas ();                  /* Función que Reparte Fichas a cada Jugador         */
 void aciertaPuntos();                    /* Función para Manejar el Puntaje del Juego         */
+void puntuaciones();                     /* Muestra las Puntuaciones Anteriores (log.txt)     */
 void finJuego();                         /* Función que se llama al Finalizar el Juego        */
-void imprimir();
 
 /***************************************** FUNCIONES *****************************************/
 // Iniciamos una Nueva Partida:
@@ -175,10 +175,8 @@ void finJuego() {
         }
     }
     jugadores[pos].totalGanados++;
-    printf ("\t║                               ║\n");
     printf ("\t║  ═══════════════════════════  ║\n");
-    printf ("\t║                               ║\n");
-    printf ("\t║     GANADOR:    %s\t\t║\n", ganador);
+    printf ("\t║       GANADOR:  %s\t║\n", ganador);
     printf ("\t╚═══════════════════════════════╝\n\n");
     
     aciertaPuntos();
@@ -253,28 +251,41 @@ void *jugar (void *arg) {
     pthread_exit(NULL);
 }
 
-
-/* FUNCIONES PARA PROBAR EL PROGRAMA */
-void imprimir() {
-    // Mostramos los datos del Jugador correpondiente:
-    for (int i = 0; i < canJug; i++) {
-        printf ("Datos del Jugador %d:\n", i+1);
-        printf ("Nombre:\t\t%s\n", jugadores[i].nom);
-        printf ("Puntos:\t\t%i\n", jugadores[i].puntos);
-        printf ("Total Puntos:\t%i\n", jugadores[i].totalPuntos);
-        printf ("Total Ganados:\t%i\n", jugadores[i].totalGanados);
-        printf ("Fichas:\n");
-        for (int j = 0; j < jugadores[i].canMazoJug; j++) {
-            printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
-        }
-        printf ("\n\n");
+void puntuaciones() {
+    FILE *archivo;                 /* Puntero al Archivo que se va a leer */
+	archivo = fopen(ARCHIVO, "r"); /* Abrimos el archivo en Modo Lectura  */
+    /* VERIFICAMOS QUE EXISTA EL ARCHIVO */
+    if (archivo == NULL) {
+        /* Mostramos un mensaje de Error: */
+        system ("clear"); /* Limpiamos Pantalla */
+        printf("Error al abrir el archivo.\n");
+        printf("Revise el nombre del archivo e intentelo nuevamente.\n\n");
+        exit (1); /* No se leyó correctamente */
     }
-    
-    printf ("Fichas para Comer:\ttotalFichas = %i\n", totalFichas);
-    for (int i = 0; i < totalFichas; i++) {
-        printf ("\tFicha #%i =\t[%i|%i]\n", i + 1, listaFichasParaComer[i].valores[0], listaFichasParaComer[i].valores[1]);
-    }
+    /* LEEMOS LA INFORMACION DEL ARCHIVO */
     printf ("\n");
+    printf ("\t      ╔═══════════════════╗\n");
+    printf ("\t╔═════╣    REGISTRO  DE   ╠═════╗\n");
+    printf ("\t╠═════╣    PUNTUACIONES   ╠═════╣\n");
+    printf ("\t║     ╚═══════════════════╝     ║\n");
+    printf ("\t║  JUGADOR        PTS     WINS  ║\n");
+    printf ("\t║  ═══════════════════════════  ║\n");
+    while (!feof(archivo)) {
+        /* Sintaxis: fscanf (*archivo, "tipo_de_dato_a_leer", donde_se_guarda) */
+        char nombre[CHAR_LIMIT] = "";
+        int Puntos;
+        int TotalPts;
+        int Ganados;
+        fscanf (archivo, "%s %d %d %d", nombre, &Puntos, &TotalPts, &Ganados);
+        if (nombre[0] != '\0') {
+            printf ("\t║  %s\t   %i\t  %i\t║\n", nombre, Puntos, TotalPts);
+        }
+    }
+    printf ("\t║  ═══════════════════════════  ║\n");
+    printf ("\t╚═══════════════════════════════╝\n\n");
+    sysPause();
+    /* CERRAMOS EL ARCHIVO */
+    fclose(archivo);
 }
 
 #endif

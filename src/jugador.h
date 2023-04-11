@@ -59,12 +59,12 @@ void crearJugadores (int type) {
         /* LEEMOS LA INFORMACION DEL ARCHIVO */
         while (!feof(archivo)) {
             /* Sintaxis: fscanf (*archivo, "tipo_de_dato_a_leer", donde_se_guarda) */
-            char nombre[CHAR_LIMIT];
+            char nombre[CHAR_LIMIT] = "";
             int Puntos = 0;
             int TotalPts = 0;
             int Ganados = 0;
             fscanf (archivo, "%s %d %d %d", nombre, &Puntos, &TotalPts, &Ganados);
-            if (nombre != "") {
+            if (nombre[0] != '\0') {
                 strcpy(jugadores[canJug].nom, nombre);
                 jugadores[canJug].puntos = Puntos;
                 jugadores[canJug].totalPuntos = TotalPts;
