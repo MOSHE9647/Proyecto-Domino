@@ -9,17 +9,17 @@
     RELACIONADAS A UNA PARTIDA.
 ****************************************************************/
 
-#include <semaphore.h>           /* Para uso de Semáforos en el Juego   */
-#include <pthread.h>             /* Para el uso de Hilos en el Juego    */
-#include <unistd.h>              /* Para uso de Sleep */
-#include "jugador.h"             /* Archivo de Cabecera de Jugador      */
-#include "lista.h"
-#include "mesa.h"
+#include <semaphore.h>  /* Para uso de Semáforos en el Juego   */
+#include <pthread.h>    /* Para el uso de Hilos en el Juego    */
+#include <unistd.h>     /* Para uso de la función Sleep        */
+#include "jugador.h"    /* Archivo de Cabecera de Jugador      */
+#include "lista.h"      /* Archivo de Cabecera de Listas       */
+#include "mesa.h"       /* Archivo de Cabecera de Mesa         */
 
 /* VARIABLES GLOBALES */
-pthread_t players[MAX_PLAYERS];
-sem_t mutex;
-Mesa *mesa;
+pthread_t players[MAX_PLAYERS]; /* Vector de Jugadores para Manejo de Hilos */
+sem_t mutex;                    /* Semáforo para Control de Turnos          */
+Mesa *mesa;                     /* Variable Para la Mesa */
 
 /* FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
 // ** CTRL + Click para ir a la Funcion

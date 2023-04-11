@@ -9,7 +9,7 @@
 *************************************************************/
 
 int main () {
-    int opc = 0;
+    int opc = 0; /* VARIABLE PARA LA OPCIÓN DEL MENU */
     do {
         system ("clear");
         printf ("\n");
@@ -26,6 +26,7 @@ int main () {
 
         switch (opc) {
             case 1: {
+                /* CREAMOS UNA NUEVA PARTIDA */
                 opc = 0;
                 printf ("\n");
                 printf ("\t      ╔═══════════════╗\n");
@@ -44,6 +45,7 @@ int main () {
                 break;
             }
             case 2: {
+                /* CONTINUAMOS DESDE EL ARCHIVO 'log.txt' */
                 printf ("Iniciando Partida desde Archivo 'log.txt'.\n");
                 sleep(1); system("clear");
                 printf ("Iniciando Partida desde Archivo 'log.txt'..\n");
@@ -56,10 +58,12 @@ int main () {
                 break;
             }
             case 3: {
+                /* MOSTRAMOS LAS PUNTUACIONES */
                 puntuaciones();
                 break;
             }
             case 4: {
+                /* SALIMOS DEL PROGRAMA */
                 return 0;
                 break;
             }

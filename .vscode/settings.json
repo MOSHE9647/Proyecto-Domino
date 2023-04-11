@@ -3,7 +3,8 @@
         "*.txt": "log",
         "stdio.h": "c",
         "string.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "partida.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "cmake.configureOnOpen": false
