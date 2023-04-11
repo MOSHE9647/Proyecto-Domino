@@ -38,7 +38,7 @@ void ingresar_Lista(Lista *lista, Nodo* nodo){
 			Nodo *actual = lista->primero;
             int salida = nodo->dato->salida;
 			while (actual != NULL){
-                int auxiliar = actual->dato->salida;
+                int auxiliar = actual->sig_auxiliar->dato->salida;
 				if(nodo->dato->valores[salida] <= actual->sig_auxiliar->dato->valores[auxiliar]){
                     nodo->sig_auxiliar = actual->sig_auxiliar;
 					actual->sig_auxiliar = nodo;
@@ -349,7 +349,7 @@ Nodo* bucarDondeColocar(Lista *lista, Ficha mazo[], int tamano, int *posicion_el
         int salida = actual->dato->salida;
 
         /* Recorriendo el vector de fichas para seleccionar al mas conveniente */
-        for(int i = 0; i < tamano-1; i++){  
+        for(int i = 0; i < tamano; i++){  
             int valor_x = mazo[i].valores[0];
             int valor_y = mazo[i].valores[1];
 

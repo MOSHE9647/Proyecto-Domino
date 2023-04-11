@@ -18,36 +18,37 @@
 
 /* VARIABLES GLOBALES */
 pthread_t players[MAX_PLAYERS];
-sem_t turno;
+int finPartida = FALSE;
+sem_t mutex;
 Mesa *mesa;
 
 /* FUNCIONES A UTILIZAR DENTRO DEL JUEGO */
 // ** CTRL + Click para ir a la Funcion
 void iniciarPartida(int type, int Jugs); /* Funcion para Iniciar la Partida con 'n' Jugadores */
-void aciertaPuntos(Jugador *j);          /* Función para Manejar el Puntaje del Juego         */
-void comerFichas(Jugador *j);            /* Para que Jugador tome una Ficha del mazo          */
 void ponerFicha (Jugador *j, int pos);   /* Funcion para Poner una Ficha en la Mesa           */
-void repartirFichas ();                  /* Función que Reparte Fichas a cada Jugador         */
-void finJuego();                         /* Función que se llama al Finalizar el Juego        */
-
-void *jugar (void *arg);
-
+void comerFichas(Jugador *j);            /* Para que Jugador tome una Ficha del mazo          */
 Jugador *buscarDobles ();
+void *jugar (void *arg);
+void repartirFichas ();                  /* Función que Reparte Fichas a cada Jugador         */
+void aciertaPuntos();                    /* Función para Manejar el Puntaje del Juego         */
+void finJuego();                         /* Función que se llama al Finalizar el Juego        */
+void imprimir();
 
-/*********************************** FUNCIONES ***********************************/
+/***************************************** FUNCIONES *****************************************/
 // Iniciamos una Nueva Partida:
 void iniciarPartida(int type, int Jugs) {
     // type = NEW: Nueva Partida : OLD: Continuar Partida
-
     mesa = (Mesa*) calloc (sizeof(Mesa), 1); /* Creamos la Mesa del Juego */
     if (type == NEW) {
         canJug = Jugs;              /* Indicamos la Cantidad de Jugadores solicitada      */
         crearJugadores(NEW);        /* Creamos a cada uno de los Jugadores segun 'canJug' */
-    } else { crearJugadores(OLD); } /* Creamos los Jugadores a partir de un Archivo       */
+    } else { 
+        crearJugadores(OLD);        /* Creamos los Jugadores a partir de un Archivo       */
+        finPartida = FALSE;
+    } 
     repartirFichas();               /* Creamos y repartimos las Fichas a Cada Jugador     */
 
-    sem_init(&turno, 1, 1);
-    // sem_init(&mesa_arbol, 1, 1);
+    sem_init(&mutex, 1, 1);
     pthread_t players[canJug];
 
     Jugador *temp;
@@ -64,29 +65,18 @@ void iniciarPartida(int type, int Jugs) {
         repartirFichas();
         sysPause();
     }
-    for (int i = temp->turno; i < canJug; i++) {
+    for (int i = temp->turno + 1; i < canJug; i++) {
         if (i == canJug - 1) {
-            i = 0;
-            pthread_create(&players[i+1], NULL, jugar, &i);
-            pthread_join(players[i+1], NULL);
-            // printf ("Turno de %s\n", jugadores[i].nom);
-            // printf ("Fichas:\n");
-            // for (int j = 0; j < jugadores[i].canMazoJug; j++) {
-            //     printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
-            // }
-            // ponerFicha(&jugadores[i], 0);
-            // sysPause(); system("clear");
+            pthread_create(&players[i], NULL, jugar, &i);
+            pthread_join(players[i], NULL);
+            i = -1;
+        } else {
+            pthread_create(&players[i], NULL, jugar, &i);
+            pthread_join(players[i], NULL);
         }
-        pthread_create(&players[i+1], NULL, jugar, &i);
-        pthread_join(players[i+1], NULL);
     }
 
-    // for (int i = 0; i < canJug; i++) {
-    //     pthread_join(players[i], NULL);
-    // }
-
-    sem_destroy(&turno);
-    // sem_destroy(&mesa_arbol);
+    sem_destroy(&mutex);
 }
 
 // Función para Repartir Fichas:
@@ -103,7 +93,7 @@ void repartirFichas () {
                 jugadores[i].mazo[j] = listaMazoTotal[0];    /* Asignamos la Ficha al Mazo del Jugador */
                 delElement(listaMazoTotal, 0, &totalFichas); /* Eliminamos la Ficha de la Lista        */
             }
-            ordenarFichas (jugadores[i].mazo, canFichasJug); /* Ordenamos las Fichas del Jugador    */
+            ordenarFichas (jugadores[i].mazo, canFichasJug); /* Ordenamos las Fichas del Jugador       */
         }
         /*************************************************
             CON EL CICLO NOS ASEGURAMOS DE QUE NINGUN
@@ -138,37 +128,65 @@ void comerFichas (Jugador *j) {
 }
 
 // Función para manejar el puntaje del Juego:
-void aciertaPuntos(Jugador *j) {
-    /* ESTO ES DE PRUEBA NO FUNCIONA */
-    FILE *archivo = fopen(ARCHIVO, "r+");
+void aciertaPuntos() {
+    FILE* archivo; /* Variable que apunta al Archivo que vamos a utilizar */
 
-    fseek(archivo, 0, SEEK_SET);
+	char PUNTOS[CHAR_LIMIT];  /* Variable para almacenar la edad en formato string   */
+	char TOTALP[CHAR_LIMIT];  /* Variable para almacenar la ID en formato string     */
+    char GANADOS[CHAR_LIMIT];
 
-    char linea[100];
-    int numeroLinea = 5; // Linea que se desea sobrescribir
-    for (int i = 0; i < numeroLinea - 1; i++) {
-        fgets(linea, 100, archivo); // Lee cada línea hasta llegar a la línea deseada
-    }
+	archivo = fopen(ARCHIVO, "w"); /* Abrimos el archivo en modo escritura sin sobreescribir */
 
-    int numCaracteres = ftell(archivo);
-    int posicion = (numeroLinea) * numCaracteres; // 100 es el tamaño máximo de cada línea
-    fseek(archivo, posicion, SEEK_SET); // Coloca el puntero al inicio de la línea
-
-    char nuevaLinea[100] = "Esta es la nueva línea"; // La nueva línea a escribir
-    fputs(nuevaLinea, archivo);
-
-    fclose(archivo);
+    // Verificamos que se haya leído el archivo:
+	if (archivo == NULL) {
+		printf("Error al abrir el archivo.");
+        return; /* No se leyó correctamente */
+	} else {
+		for (int i = 0; i < canJug; i++) {
+            sprintf (PUNTOS, "%d", jugadores[i].puntos);        /* Convertimos puntos de 'int' a 'string'       */
+            sprintf (TOTALP, "%d", jugadores[i].totalPuntos);   /* Convertimos totalPuntos de 'int' a 'string'  */
+            sprintf (GANADOS, "%d", jugadores[i].totalGanados); /* Convertimos totalGanados de 'int' a 'string' */
+            
+            /* Escribimos la información de las variables en el archivo */
+            fputs (jugadores[i].nom, archivo);  fputs (" ", archivo);
+            fputs (PUNTOS, archivo);            fputs (" ", archivo);
+            fputs (TOTALP, archivo);            fputs (" ", archivo);
+            fputs (GANADOS, archivo);           fputs ("\n", archivo);
+        }
+	}
+	fclose (archivo); /* Cerramos el archivo   */
 }
 
 void finJuego() {
     system("clear");
-    printf ("Fin del Juego\n");
-    printf ("Mesa:\n\n");
-    Mostrar_Nodos(mesa);
+    int puntajeMayor = 0;
+    char ganador[CHAR_LIMIT];
+    int pos = 0;
+    printf ("\n");
+    printf ("\t      ╔═══════════════════╗\n");
+    printf ("\t╔═════╣   FIN DEL JUEGO   ╠═════╗\n");
+    printf ("\t╠═════╣ REPORTE DE PUNTOS ╠═════╣\n");
+    printf ("\t║     ╚═══════════════════╝     ║\n");
+    printf ("\t║  JUGADOR        PTS     WINS  ║\n");
+    printf ("\t║  ═══════════════════════════  ║\n");
+    for (int i = 0; i < canJug; i++) {
+        printf ("\t║  %s\t   %i\t %i\t║\n", jugadores[i].nom, jugadores[i].puntos, jugadores[i].totalGanados);
+        if (jugadores[i].puntos > puntajeMayor) { 
+            puntajeMayor = jugadores[i].puntos;
+            strcpy (ganador, jugadores[i].nom);
+            pos = i;
+        }
+    }
+    jugadores[pos].totalGanados++;
+    printf ("\t║                               ║\n");
+    printf ("\t║  ═══════════════════════════  ║\n");
+    printf ("\t║                               ║\n");
+    printf ("\t║     GANADOR:    %s\t\t║\n", ganador);
+    printf ("\t╚═══════════════════════════════╝\n\n");
 
-    
-
-    exit(0);
+    finPartida = TRUE;
+    aciertaPuntos();
+    return;
 }
 
 void ponerFicha (Jugador *j, int pos) {
@@ -179,16 +197,18 @@ void ponerFicha (Jugador *j, int pos) {
     } else {
         int posicion = -1, direccion = 0, cruzado = 0, puntos = 0;
         Lista *lista = Fichas_Libres(mesa);
+        printf ("Posibles Jugadas:\n");
         Nodo *destino = bucarDondeColocar (lista, j->mazo, j->canMazoJug, &posicion, &direccion, &cruzado, &puntos);
         if (destino != NULL) {
             AgregarNodoArbol(mesa, &j->mazo[posicion], destino, direccion, cruzado);
             Mostrar_Lista (lista);
-            printf ("\nPuntos: %d\tFicha: [%i|%i]\t Posicion = %i\n", puntos, j->mazo[posicion].valores[0], j->mazo[posicion].valores[1], posicion);
+            printf ("Puntos: %d\tFicha: [%i|%i]\n", puntos, j->mazo[posicion].valores[0], j->mazo[posicion].valores[1]);
             delElement (j->mazo, posicion, &j->canMazoJug);
             if (puntos != 0 && puntos % 5 == 0) { 
                 j->puntos += puntos / 5;
                 j->totalPuntos += puntos;
-                printf ("Adquiere %i Puntos\n", (puntos / 5));
+                aciertaPuntos();
+                printf ("Adquiere %i Puntos\n\n", (puntos / 5));
             }
         } else {
             printf ("%s tuvo que Comer una Ficha y pierde turno\n", j->nom);
@@ -220,7 +240,7 @@ Jugador *buscarDobles () {
 void *jugar (void *arg) {
     int ID = *(int *)arg;
 
-    sem_wait(&turno);
+    sem_wait(&mutex);
 
     printf ("Turno de %s\n", jugadores[ID].nom);
     printf ("Fichas:\n");
@@ -231,8 +251,32 @@ void *jugar (void *arg) {
     ponerFicha(&jugadores[ID], 0);
     sysPause(); system("clear");
 
-    sem_post(&turno);
+    sem_post(&mutex);
     pthread_exit(NULL);
+}
+
+
+/* FUNCIONES PARA PROBAR EL PROGRAMA */
+void imprimir() {
+    // Mostramos los datos del Jugador correpondiente:
+    for (int i = 0; i < canJug; i++) {
+        printf ("Datos del Jugador %d:\n", i+1);
+        printf ("Nombre:\t\t%s\n", jugadores[i].nom);
+        printf ("Puntos:\t\t%i\n", jugadores[i].puntos);
+        printf ("Total Puntos:\t%i\n", jugadores[i].totalPuntos);
+        printf ("Total Ganados:\t%i\n", jugadores[i].totalGanados);
+        printf ("Fichas:\n");
+        for (int j = 0; j < jugadores[i].canMazoJug; j++) {
+            printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
+        }
+        printf ("\n\n");
+    }
+    
+    printf ("Fichas para Comer:\ttotalFichas = %i\n", totalFichas);
+    for (int i = 0; i < totalFichas; i++) {
+        printf ("\tFicha #%i =\t[%i|%i]\n", i + 1, listaFichasParaComer[i].valores[0], listaFichasParaComer[i].valores[1]);
+    }
+    printf ("\n");
 }
 
 #endif

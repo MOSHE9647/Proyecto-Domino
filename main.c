@@ -8,29 +8,6 @@
         donde se encuentra la misma.
 *************************************************************/
 
-/* FUNCIONES PARA PROBAR EL PROGRAMA */
-void imprimir() {
-    // Mostramos los datos del Jugador correpondiente:
-    for (int i = 0; i < canJug; i++) {
-        printf ("Datos del Jugador %d:\n", i+1);
-        printf ("Nombre:\t\t%s\n", jugadores[i].nom);
-        printf ("Puntos:\t\t%i\n", jugadores[i].puntos);
-        printf ("Total Puntos:\t%i\n", jugadores[i].totalPuntos);
-        printf ("Total Ganados:\t%i\n", jugadores[i].totalGanados);
-        printf ("Fichas:\n");
-        for (int j = 0; j < jugadores[i].canMazoJug; j++) {
-            printf ("\t#%i =\t[%i|%i]\n", j + 1, jugadores[i].mazo[j].valores[0], jugadores[i].mazo[j].valores[1]);
-        }
-        printf ("\n\n");
-    }
-    
-    printf ("Fichas para Comer:\ttotalFichas = %i\n", totalFichas);
-    for (int i = 0; i < totalFichas; i++) {
-        printf ("\tFicha #%i =\t[%i|%i]\n", i + 1, listaFichasParaComer[i].valores[0], listaFichasParaComer[i].valores[1]);
-    }
-    printf ("\n");
-}
-
 int main () {
     int opc = 0;
     do {
@@ -65,8 +42,6 @@ int main () {
                 printf ("\t Digite una Opción [2-7]: ");
                 scanf  ("%i", &opc); system ("clear");
                 iniciarPartida(NEW, opc);
-                //imprimir ();/**/
-                //sysPause();/**/
                 break;
             }
             case 2: {

@@ -73,10 +73,10 @@ void crearJugadores (int type) {
             scanf ("%s", jugadores[i].nom);
         }
     }
-    srand (time(NULL));
+    //srand (time(NULL));
     for (int i = 0; i < canJug; i++) {
-        int turno = rand() % canJug;
-        jugadores[i].turno = turno;
+        //int turno = rand() % canJug;
+        jugadores[i].turno = i;
         system("clear");
     }
 }
