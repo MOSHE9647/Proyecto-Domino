@@ -278,7 +278,7 @@ void puntuaciones() {
         int Ganados;
         fscanf (archivo, "%s %d %d %d", nombre, &Puntos, &TotalPts, &Ganados);
         if (nombre[0] != '\0') {
-            printf ("\t║  %s\t   %i\t  %i\t║\n", nombre, Puntos, TotalPts);
+            printf ("\t║  %s\t   %i\t  %i\t║\n", nombre, Puntos, Ganados);
         }
     }
     printf ("\t║  ═══════════════════════════  ║\n");
